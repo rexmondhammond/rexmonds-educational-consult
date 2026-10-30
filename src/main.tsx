@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import { AppProvider } from "./state/AppContext";
+import { ClassProvider } from "./state/ClassContext";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 
 const root = document.getElementById("root");
@@ -12,7 +13,9 @@ createRoot(root).render(
   <StrictMode>
     <ErrorBoundary>
       <AppProvider>
-        <App />
+        <ClassProvider>
+          <App />
+        </ClassProvider>
       </AppProvider>
     </ErrorBoundary>
   </StrictMode>,

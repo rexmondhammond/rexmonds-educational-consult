@@ -2,6 +2,11 @@
 
 Ghana's JHS/SHS learning platform: NaCCA/GES textbook vault, Pasco lab with stanine and placement tools, live chalkboard studio with recording, interactive video lessons, Google Classroom vault, data-saver/offline mode, and an **AI tutor** (explain, quiz, WAEC-style marking, study plans).
 
+## Two experiences in one app
+- **Student:** My Learning (goals, rings, flashcards, today's focus), AI Tutor, Assessments (timed tests, instant marking, feedback), My Growth (topic mastery, trend, personalised recommendations), Textbook Vault, Pasco Lab, Video Lessons.
+- **Teacher:** Class Overview (KPIs, score distribution, topic mastery, mastery heatmap, recommended actions), Assessment Builder (manual or AI-generated questions, publish to class), Gradebook (auto-marking, key-point suggestions, AI marking, confirm, item analysis, CSV export), AI Assistant (lesson plans, question sets, feedback), Live Studio.
+- Switch roles with the Student/Teacher toggle. The class roster is simulated and deterministic so analytics are populated; assessments, submissions and grades persist in the browser (localStorage). A production deployment would add a database and sign-in.
+
 ## Stack
 React 19 + TypeScript, Tailwind CSS v4, Vite, Lucide, canvas-confetti. AI runs through a Vercel serverless function (`api/tutor.ts`) so the API key never reaches the browser.
 

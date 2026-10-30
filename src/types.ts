@@ -116,6 +116,7 @@ export interface Settings {
   cachedPasco: string[];
   name?: string;
   level?: Level;
+  role?: Role;
   onboarded?: boolean;
 }
 
@@ -127,4 +128,61 @@ export type View =
   | "player"
   | "classroom"
   | "data"
-  | "tutor";
+  | "tutor"
+  | "assessments"
+  | "growth"
+  | "t-home"
+  | "t-build"
+  | "t-grades";
+
+export type Role = "student" | "teacher";
+
+export type QType = "mcq" | "short";
+
+export interface AQuestion {
+  id: string;
+  type: QType;
+  prompt: string;
+  options?: string[];
+  correct?: number;
+  keyPoints?: string[];
+  marks: number;
+  topic: string;
+  explanation: string;
+}
+
+export interface Assessment {
+  id: string;
+  title: string;
+  subject: string;
+  level: Level;
+  className: string;
+  durationMin: number;
+  createdAt: number;
+  status: "draft" | "published";
+  source: "seed" | "teacher";
+  questions: AQuestion[];
+}
+
+export interface Submission {
+  id: string;
+  assessmentId: string;
+  studentId: string;
+  answers: Record<string, number | string>;
+  submittedAt: number;
+  timeSpentSec: number;
+}
+
+export interface Grading {
+  manual: Record<string, number>;
+  comments: Record<string, string>;
+  feedback: string;
+}
+
+export interface Student {
+  id: string;
+  name: string;
+  mastery: Record<string, number>;
+  attendance: number;
+  streak: number;
+}

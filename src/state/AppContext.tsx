@@ -3,7 +3,7 @@ import confetti from "canvas-confetti";
 import { SUBJECTS, TOTAL_CHAPTERS, chapterKey } from "../data/curriculum";
 import { DEMO_LESSONS } from "../data/videos";
 import { usePersistentState } from "../lib/storage";
-import type { Progress, Settings, VideoLesson, View } from "../types";
+import type { Progress, Role, Settings, VideoLesson, View } from "../types";
 
 const DEFAULT_PROGRESS: Progress = {
   completedChapters: [],
@@ -61,11 +61,13 @@ interface AppState {
   dismissToast: (id: number) => void;
   paletteOpen: boolean;
   setPaletteOpen: (open: boolean) => void;
+  role: Role;
+  switchRole: (role: Role) => void;
 }
 
 export interface TutorSeed {
   prompt: string;
-  mode?: "explain" | "quiz" | "mark" | "plan";
+  mode?: "explain" | "quiz" | "mark" | "plan" | "lesson" | "questions" | "feedback";
   subject?: string;
 }
 
@@ -112,6 +114,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.classList.toggle("data-saver", settings.dataSaver);
   }, [settings.dataSaver]);
+
+  const startedRole = useRef(false);
+  useEffect(() => {
+    if (startedRole.current) return;
+    startedRole.current = true;
+    if (settings.role === "teacher") setView("t-home");
+  }, [settings.role]);
 
   const lessons = useMemo(() => [...recorded, ...DEMO_LESSONS], [recorded]);
 
@@ -234,6 +243,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const clearTutorSeed = useCallback(() => setTutorSeed(null), []);
 
+  const role: Role = settings.role ?? "student";
+  const switchRole = useCallback(
+    (next: Role) => {
+      setSettings((s) => ({ ...s, role: next }));
+      setView(next === "teacher" ? "t-home" : "dashboard");
+    },
+    [setSettings],
+  );
+
   const updateSettings = useCallback((patch: Partial<Settings>) => setSettings((s) => ({ ...s, ...patch })), [setSettings]);
 
   const openLesson = useCallback((id: string) => {
@@ -244,7 +262,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const value: AppState = {
     view, setView, activeLessonId, openLesson, progress, settings, updateSettings, lessons, publishLesson,
     toggleChapter, recordQuiz, addGoal, toggleGoal, gradeCard, completion, badges, online, celebrate,
-    tutorSeed, askTutor, clearTutorSeed, toasts, notify, dismissToast, paletteOpen, setPaletteOpen,
+    tutorSeed, askTutor, clearTutorSeed, toasts, notify, dismissToast, paletteOpen, setPaletteOpen, role, switchRole,
   };
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
-import { BookOpen, Bot, Calculator, Cloud, LayoutDashboard, PlayCircle, Radio, Search, Zap } from "lucide-react";
+import { BookOpen, Bot, Search, Zap } from "lucide-react";
 import { SUBJECTS } from "../data/curriculum";
 import { useApp } from "../state/AppContext";
 import { cx } from "./ui";
-import type { View } from "../types";
+import { navFor } from "../nav";
 
 interface Command {
   id: string;
@@ -13,19 +13,8 @@ interface Command {
   run: () => void;
 }
 
-const VIEWS: { id: View; label: string; hint: string; icon: ComponentType<{ className?: string }> }[] = [
-  { id: "dashboard", label: "Command Center", hint: "Progress, goals and flashcards", icon: LayoutDashboard },
-  { id: "tutor", label: "AI Tutor", hint: "Explain, quiz, mark, plan", icon: Bot },
-  { id: "vault", label: "Textbook Vault", hint: "NaCCA-aligned study manuals", icon: BookOpen },
-  { id: "pasco", label: "Pasco Lab", hint: "Past questions, aggregate, report card", icon: Calculator },
-  { id: "studio", label: "Live Studio", hint: "Chalkboard, record and broadcast", icon: Radio },
-  { id: "player", label: "Video Lessons", hint: "Interactive checkpoints", icon: PlayCircle },
-  { id: "classroom", label: "Classroom Vault", hint: "Zero-Drive Google Classroom", icon: Cloud },
-  { id: "data", label: "Data Saver", hint: "Low-bandwidth and offline mode", icon: Zap },
-];
-
 export function CommandPalette() {
-  const { paletteOpen, setPaletteOpen, setView, askTutor, settings, updateSettings, notify } = useApp();
+  const { paletteOpen, setPaletteOpen, setView, askTutor, settings, updateSettings, notify, role } = useApp();
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -56,7 +45,7 @@ export function CommandPalette() {
     if (q.length > 2) {
       list.push({ id: "ask", label: `Ask AI: ${query.trim()}`, hint: "Get a step-by-step explanation", icon: Bot, run: () => { close(); askTutor({ prompt: query.trim() }); } });
     }
-    for (const v of VIEWS) list.push({ id: v.id, label: v.label, hint: v.hint, icon: v.icon, run: () => { close(); setView(v.id); } });
+    for (const v of navFor(role)) list.push({ id: v.id, label: v.label, hint: v.hint, icon: v.icon, run: () => { close(); setView(v.id); } });
     list.push({
       id: "toggle-data",
       label: settings.dataSaver ? "Turn Data Saver off" : "Turn Data Saver on",
@@ -69,7 +58,7 @@ export function CommandPalette() {
     }
     if (!q) return list.filter((c) => !c.id.startsWith("s-")).slice(0, 10);
     return list.filter((c) => c.id === "ask" || `${c.label} ${c.hint}`.toLowerCase().includes(q)).slice(0, 9);
-  }, [query, askTutor, notify, setPaletteOpen, setView, settings.dataSaver, updateSettings]);
+  }, [query, askTutor, notify, setPaletteOpen, setView, settings.dataSaver, updateSettings, role]);
 
   if (!paletteOpen) return null;
 

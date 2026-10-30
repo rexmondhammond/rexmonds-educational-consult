@@ -84,3 +84,8 @@ body::before {
   .print-sheet { background: #fff !important; color: #000 !important; box-shadow: none !important; border: 1px solid #999 !important; }
   .print-sheet * { color: #000 !important; }
 }
+
+/* Let grid children shrink below their content width so phones never scroll sideways. */
+main .grid > * {
+  min-width: 0;
+}

@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { Award, BookOpen, Calculator, CheckCircle2, Circle, Clock, Layers, PlayCircle, Plus, Radio, School, Trophy } from "lucide-react";
+import { Award, BookOpen, Calculator, CheckCircle2, Circle, Clock, Layers, PlayCircle, Plus, Radio, School, Sparkles, Trophy } from "lucide-react";
 import { SUBJECTS, TOTAL_CHAPTERS } from "../data/curriculum";
 import { useApp } from "../state/AppContext";
+import { useClass } from "../state/ClassContext";
+import { studentRecommendations, studentTopicMastery } from "../lib/assessment";
+import { RecoCard, useActOnReco } from "./student/Growth";
 import { Button, Glass, Modal, Pill, ProgressRing, SectionTitle, cx } from "../components/ui";
 import type { View } from "../types";
 
@@ -43,15 +46,17 @@ function countdown(ms: number): string {
 }
 
 const POWER: { view: View; label: string; icon: typeof Radio; tone: string }[] = [
-  { view: "studio", label: "Live Classes", icon: Radio, tone: "text-red-300" },
+  { view: "player", label: "Video Lessons", icon: Radio, tone: "text-red-300" },
   { view: "vault", label: "Ghana E-Textbooks", icon: BookOpen, tone: "text-amber-300" },
   { view: "tutor", label: "WAEC AI Lab", icon: Calculator, tone: "text-cyan-300" },
-  { view: "pasco", label: "Schools League", icon: School, tone: "text-emerald-300" },
-  { view: "pasco", label: "Pasco Hub", icon: Layers, tone: "text-violet-300" },
+  { view: "assessments", label: "My Assessments", icon: School, tone: "text-emerald-300" },
+  { view: "growth", label: "My Growth", icon: Layers, tone: "text-violet-300" },
 ];
 
 export default function Dashboard() {
   const { settings, progress, completion, badges, setView, toggleGoal, addGoal, gradeCard, lessons, openLesson } = useApp();
+  const cls = useClass();
+  const actOnReco = useActOnReco();
   const [now, setNow] = useState(() => Date.now());
   const [mountedAt] = useState(() => Date.now());
   const [goalText, setGoalText] = useState("");
@@ -66,6 +71,12 @@ export default function Dashboard() {
     () => ALL_CARDS.filter((c) => (progress.flashcards[c.id]?.due ?? 0) <= now),
     [progress.flashcards, now],
   );
+
+  const focus = useMemo(() => {
+    const mine = cls.submissions.filter((x) => x.studentId === cls.me.id);
+    const mastery = studentTopicMastery(cls.me, mine, cls.assessments, cls.gradings);
+    return studentRecommendations(mastery, cls.published.length - mine.length, dueCards.length).slice(0, 3);
+  }, [cls, dueCards.length]);
 
   const goalsDone = progress.goals.filter((g) => g.done).length;
   const goalPct = progress.goals.length ? (goalsDone / progress.goals.length) * 100 : 0;
@@ -90,6 +101,11 @@ export default function Dashboard() {
           </button>
         ))}
       </section>
+
+      <Glass className="space-y-3 border-amber-400/30 p-5" as="section">
+        <h2 className="flex items-center gap-2 text-lg font-bold text-white"><Sparkles className="h-5 w-5 text-amber-300" /> Your focus today</h2>
+        <ul className="grid gap-3 md:grid-cols-3">{focus.map((r) => <RecoCard key={r.id} r={r} onAct={actOnReco} />)}</ul>
+      </Glass>
 
       <div className="grid gap-6 xl:grid-cols-3">
         <Glass className="p-5 xl:col-span-2" as="section">
