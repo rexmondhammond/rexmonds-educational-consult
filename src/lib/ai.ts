@@ -66,7 +66,7 @@ export async function streamTutor(opts: StreamOptions): Promise<void> {
 }
 
 export const FAILURE_COPY: Record<AiFailure, string> = {
-  not_configured: "The AI tutor is not connected yet. The site owner needs to add an ANTHROPIC_API_KEY on the host. Meanwhile, here is what the offline curriculum vault found.",
+  not_configured: "The AI tutor is not connected yet. The site owner needs to add an AI key (GEMINI_API_KEY is free) on the host. Meanwhile, here is what the offline curriculum vault found.",
   rate_limited: "You are asking very fast. Take a breath and try again in a minute.",
   offline: "You appear to be offline. Here is what the offline curriculum vault found.",
   unavailable: "The AI tutor could not answer just now. Please try again. Here is what the offline curriculum vault found.",

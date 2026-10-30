@@ -15,7 +15,7 @@ npm run build        # tsc --noEmit && vite build
 
 ## Deploy to Vercel
 1. Push to GitHub, then import the repo at vercel.com/new (Vite is auto-detected).
-2. Add `ANTHROPIC_API_KEY` under Settings > Environment Variables (Production, Preview, Development), then redeploy.
+2. Add `GEMINI_API_KEY` (free, from aistudio.google.com/apikey) or `ANTHROPIC_API_KEY` under Settings > Environment Variables, then redeploy.
 3. Open the site and try the **AI Tutor** tab. `GET /api/tutor` reports `{"configured":true}` when the key is set.
 
 Syllabus codes and past-question content are indicative; verify against current NaCCA and WAEC documents before relying on them for exams.
