@@ -22,11 +22,11 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (!this.state.error) return this.props.children;
     return (
-      <div role="alert" className="m-6 rounded-2xl border border-red-500/40 bg-red-500/10 p-6 text-red-100">
+      <div role="alert" className="m-6 rounded-2xl border border-bad/40 bg-bad/10 p-6 text-bad-t">
         <h2 className="text-lg font-bold">Something went wrong{this.props.label ? ` in ${this.props.label}` : ""}.</h2>
-        <p className="mt-2 text-sm text-red-200/80">{this.state.error.message}</p>
+        <p className="mt-2 text-sm text-bad-t/80">{this.state.error.message}</p>
         <button
-          className="mt-4 min-h-11 rounded-xl bg-red-500 px-4 text-sm font-semibold text-white"
+          className="mt-4 min-h-11 rounded-xl bg-bad px-4 text-sm font-semibold text-ink"
           onClick={() => this.setState({ error: null })}
         >
           Try again

@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import { AppProvider } from "./state/AppContext";
+import { AuthProvider } from "./state/AuthContext";
 import { ClassProvider } from "./state/ClassContext";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 
@@ -12,11 +13,13 @@ if (!root) throw new Error("Root element #root not found");
 createRoot(root).render(
   <StrictMode>
     <ErrorBoundary>
-      <AppProvider>
-        <ClassProvider>
-          <App />
-        </ClassProvider>
-      </AppProvider>
+      <AuthProvider>
+        <AppProvider>
+          <ClassProvider>
+            <App />
+          </ClassProvider>
+        </AppProvider>
+      </AuthProvider>
     </ErrorBoundary>
   </StrictMode>,
 );

@@ -1,3 +1,4 @@
+import { groundingFor } from "./grounding";
 export type TutorMode = "explain" | "quiz" | "mark" | "plan" | "lesson" | "questions" | "feedback" | "json";
 
 export interface ChatTurn {
@@ -24,6 +25,9 @@ export interface StreamOptions {
   level: "JHS" | "SHS";
   subject: string;
   concise: boolean;
+  /** Reference text the AI must teach from. Leave undefined to auto-select from the curriculum vault. */
+  context?: string;
+  temperature?: number;
   signal: AbortSignal;
   onToken: (text: string) => void;
 }
@@ -44,6 +48,8 @@ export async function streamTutor(opts: StreamOptions): Promise<void> {
         level: opts.level,
         subject: opts.subject,
         concise: opts.concise,
+        context: opts.context ?? groundingFor(opts.subject, opts.messages[opts.messages.length - 1]?.content ?? "", opts.level).text,
+        temperature: opts.temperature,
       }),
     });
   } catch (err) {
@@ -81,7 +87,7 @@ export async function streamTutor(opts: StreamOptions): Promise<void> {
 }
 
 /** Runs one non-interactive AI request and returns the complete text. */
-export async function askOnce(prompt: string, mode: TutorMode, level: "JHS" | "SHS", subject = "", signal?: AbortSignal): Promise<string> {
+export async function askOnce(prompt: string, mode: TutorMode, level: "JHS" | "SHS", subject = "", signal?: AbortSignal, extra: { context?: string; temperature?: number } = {}): Promise<string> {
   let out = "";
   await streamTutor({
     messages: [{ id: "q", role: "user", content: prompt }],
@@ -89,6 +95,8 @@ export async function askOnce(prompt: string, mode: TutorMode, level: "JHS" | "S
     level,
     subject,
     concise: false,
+    context: extra.context,
+    temperature: extra.temperature,
     signal: signal ?? new AbortController().signal,
     onToken: (t) => { out += t; },
   });

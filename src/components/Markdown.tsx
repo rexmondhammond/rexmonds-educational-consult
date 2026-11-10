@@ -11,8 +11,8 @@ function inline(text: string, keyPrefix: string): ReactNode[] {
     if (idx > last) out.push(text.slice(last, idx));
     const tok = m[0];
     const key = `${keyPrefix}-${i++}`;
-    if (tok.startsWith("**")) out.push(<strong key={key} className="font-bold text-white">{tok.slice(2, -2)}</strong>);
-    else if (tok.startsWith("`")) out.push(<code key={key} className="mono rounded bg-slate-800 px-1.5 py-0.5 text-[0.85em] text-cyan-200">{tok.slice(1, -1)}</code>);
+    if (tok.startsWith("**")) out.push(<strong key={key} className="font-bold text-ink">{tok.slice(2, -2)}</strong>);
+    else if (tok.startsWith("`")) out.push(<code key={key} className="mono rounded bg-sunken px-1.5 py-0.5 text-[0.85em] text-sky-t">{tok.slice(1, -1)}</code>);
     else out.push(<em key={key}>{tok.slice(1, -1)}</em>);
     last = idx + tok.length;
   }
@@ -39,8 +39,8 @@ export function Markdown({ text }: { text: string }) {
       const items = list.items.map((it, i) => <li key={`${k}-${i}`}>{inline(it, `${k}-${i}`)}</li>);
       blocks.push(
         list.ordered
-          ? <ol key={k} className="list-decimal space-y-1 pl-5 marker:text-amber-300">{items}</ol>
-          : <ul key={k} className="list-disc space-y-1 pl-5 marker:text-cyan-300">{items}</ul>,
+          ? <ol key={k} className="list-decimal space-y-1 pl-5 marker:text-brand-t">{items}</ol>
+          : <ul key={k} className="list-disc space-y-1 pl-5 marker:text-sky-t">{items}</ul>,
       );
       list = null;
     }
@@ -60,7 +60,7 @@ export function Markdown({ text }: { text: string }) {
     } else if (heading) {
       flushPara(); flushList();
       const k = `h${blocks.length}`;
-      blocks.push(<h4 key={k} className="pt-1 text-base font-bold text-amber-300">{inline(heading[1], k)}</h4>);
+      blocks.push(<h4 key={k} className="pt-1 text-base font-bold text-brand-t">{inline(heading[1], k)}</h4>);
     } else if (line.trim() === "") {
       flushPara(); flushList();
     } else {
@@ -69,5 +69,5 @@ export function Markdown({ text }: { text: string }) {
     }
   }
   flushPara(); flushList();
-  return <div className="space-y-2 text-sm text-slate-200">{blocks}</div>;
+  return <div className="space-y-2 text-sm text-ink">{blocks}</div>;
 }

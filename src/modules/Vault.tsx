@@ -104,7 +104,7 @@ export default function Vault() {
           {(["JHS", "SHS"] as Level[]).map((l) => (
             <button
               key={l} role="tab" aria-selected={level === l} onClick={() => setLevel(l)}
-              className={cx("min-h-11 rounded-lg px-5 text-sm font-bold transition", level === l ? "bg-amber-400 text-slate-950" : "text-slate-300 hover:text-white")}
+              className={cx("min-h-11 rounded-lg px-5 text-sm font-bold transition", level === l ? "bg-brand text-on-brand" : "text-ink-2 hover:text-ink")}
             >
               {l === "JHS" ? "JHS 1-3 (Basic 7-9)" : "SHS 1-3 (WASSCE)"}
             </button>
@@ -116,7 +116,7 @@ export default function Vault() {
             {(["All", "Core", "Elective"] as const).map((t) => (
               <button
                 key={t} role="tab" aria-selected={track === t} onClick={() => setTrack(t)}
-                className={cx("min-h-11 rounded-lg px-4 text-sm font-semibold", track === t ? "bg-cyan-400 text-slate-950" : "text-slate-300")}
+                className={cx("min-h-11 rounded-lg px-4 text-sm font-semibold", track === t ? "bg-sky-b text-on-brand" : "text-ink-2")}
               >
                 {t}
               </button>
@@ -126,15 +126,15 @@ export default function Vault() {
 
         <label className="relative min-w-52 flex-1 sm:max-w-xs">
           <span className="sr-only">Search subjects</span>
-          <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-slate-500" />
+          <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-mute" />
           <input
             value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search subjects…"
-            className="min-h-11 w-full rounded-xl border border-slate-700 bg-slate-900/80 pl-9 pr-3 text-sm text-white placeholder:text-slate-500"
+            className="min-h-11 w-full rounded-xl border border-line bg-surface/80 pl-9 pr-3 text-sm text-ink placeholder:text-mute"
           />
         </label>
       </div>
 
-      <p className="mono text-xs text-slate-400">{list.length} subjects</p>
+      <p className="mono text-xs text-mute">{list.length} subjects</p>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {list.map((s) => {
@@ -149,17 +149,17 @@ export default function Vault() {
                 <Pill tone="slate">{s.level === "JHS" ? "JHS" : s.track}</Pill>
                 {settings.cachedTextbooks.includes(s.id) && <Pill tone="emerald">Offline</Pill>}
               </div>
-              <h2 className="text-lg font-extrabold leading-snug text-white">{s.name}</h2>
-              <p className="mt-1 line-clamp-2 text-sm text-slate-300">{s.summary}</p>
-              <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-slate-800" aria-hidden>
+              <h2 className="text-lg font-extrabold leading-snug text-ink">{s.name}</h2>
+              <p className="mt-1 line-clamp-2 text-sm text-ink-2">{s.summary}</p>
+              <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-sunken" aria-hidden>
                 <div className="h-full rounded-full bg-current" style={{ width: `${pct}%` }} />
               </div>
-              <p className="mono mt-1 text-xs text-slate-400">{done}/{s.chapters.length} chapters · {s.syllabusCode}</p>
+              <p className="mono mt-1 text-xs text-mute">{done}/{s.chapters.length} chapters · {s.syllabusCode}</p>
             </button>
           );
         })}
       </div>
-      {list.length === 0 && <p className="text-slate-400">No subjects match your search.</p>}
+      {list.length === 0 && <p className="text-mute">No subjects match your search.</p>}
     </div>
   );
 }
@@ -178,8 +178,8 @@ function SubjectView({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="mono text-xs uppercase tracking-widest">{subject.level} · {subject.track} · {subject.syllabusCode}</p>
-            <h1 className="mt-1 text-2xl font-extrabold text-white sm:text-3xl">{subject.name}</h1>
-            <p className="mt-1 max-w-2xl text-sm text-slate-300">{subject.summary}</p>
+            <h1 className="mt-1 text-2xl font-extrabold text-ink sm:text-3xl">{subject.name}</h1>
+            <p className="mt-1 max-w-2xl text-sm text-ink-2">{subject.summary}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button variant="gold" onClick={() => exportManual(subject, false)}><Download className="h-4 w-4" /> Export Study Manual</Button>
@@ -198,10 +198,10 @@ function SubjectView({
             return (
               <button
                 key={c.code} onClick={() => setOpenCode(c.code)} aria-current={chapter?.code === c.code ? "true" : undefined}
-                className={cx("flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm", chapter?.code === c.code ? "bg-amber-400/15 text-amber-200" : "text-slate-300 hover:bg-slate-800/60")}
+                className={cx("flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm", chapter?.code === c.code ? "bg-brand/15 text-brand-t" : "text-ink-2 hover:bg-sunken/60")}
               >
-                <CheckCircle2 className={cx("h-5 w-5 shrink-0", isDone ? "text-emerald-400" : "text-slate-600")} />
-                <span><span className="mono block text-[11px] text-slate-500">{c.code}</span>{c.title}</span>
+                <CheckCircle2 className={cx("h-5 w-5 shrink-0", isDone ? "text-good-t" : "text-mute")} />
+                <span><span className="mono block text-[11px] text-mute">{c.code}</span>{c.title}</span>
               </button>
             );
           })}
@@ -211,8 +211,8 @@ function SubjectView({
           <Glass className="space-y-5 p-5 sm:p-7" as="article">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="mono text-xs text-amber-400">{chapter.code}</p>
-                <h2 className="text-xl font-extrabold text-white">{chapter.title}</h2>
+                <p className="mono text-xs text-brand-t">{chapter.code}</p>
+                <h2 className="text-xl font-extrabold text-ink">{chapter.title}</h2>
               </div>
               <Button
                 variant={done.includes(chapterKey(subject.id, chapter.code)) ? "teal" : "ghost"}
@@ -226,25 +226,25 @@ function SubjectView({
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <h3 className="mb-2 text-sm font-bold uppercase tracking-wider text-slate-400">Learning outcomes</h3>
-                <ul className="list-disc space-y-1 pl-5 text-sm text-slate-200">{chapter.outcomes.map((o) => <li key={o}>{o}</li>)}</ul>
+                <h3 className="mb-2 text-sm font-bold uppercase tracking-wider text-mute">Learning outcomes</h3>
+                <ul className="list-disc space-y-1 pl-5 text-sm text-ink">{chapter.outcomes.map((o) => <li key={o}>{o}</li>)}</ul>
               </div>
               <div>
-                <h3 className="mb-2 text-sm font-bold uppercase tracking-wider text-slate-400">Key ideas</h3>
-                <ul className="list-disc space-y-1 pl-5 text-sm text-slate-200">{chapter.keyIdeas.map((o) => <li key={o} className="mono text-[13px]">{o}</li>)}</ul>
+                <h3 className="mb-2 text-sm font-bold uppercase tracking-wider text-mute">Key ideas</h3>
+                <ul className="list-disc space-y-1 pl-5 text-sm text-ink">{chapter.keyIdeas.map((o) => <li key={o} className="mono text-[13px]">{o}</li>)}</ul>
               </div>
             </div>
 
-            <div className="rounded-xl border border-cyan-400/30 bg-cyan-400/5 p-4">
-              <h3 className="mb-1 flex items-center gap-2 text-sm font-bold text-cyan-300"><Lightbulb className="h-4 w-4" /> Worked example: {chapter.example.title}</h3>
-              <p className="text-sm text-slate-100">{chapter.example.problem}</p>
-              <ol className="mono mt-3 list-decimal space-y-1 pl-5 text-[13px] text-slate-300">{chapter.example.steps.map((s) => <li key={s}>{s}</li>)}</ol>
-              <p className="mono mt-3 rounded-lg bg-slate-950/60 p-3 text-sm text-amber-200">Answer: {chapter.example.answer}</p>
+            <div className="rounded-xl border border-sky-b/30 bg-sky-b/5 p-4">
+              <h3 className="mb-1 flex items-center gap-2 text-sm font-bold text-sky-t"><Lightbulb className="h-4 w-4" /> Worked example: {chapter.example.title}</h3>
+              <p className="text-sm text-ink">{chapter.example.problem}</p>
+              <ol className="mono mt-3 list-decimal space-y-1 pl-5 text-[13px] text-ink-2">{chapter.example.steps.map((s) => <li key={s}>{s}</li>)}</ol>
+              <p className="mono mt-3 rounded-lg bg-canvas/60 p-3 text-sm text-brand-t">Answer: {chapter.example.answer}</p>
             </div>
 
-            <div className="rounded-xl border border-amber-400/30 bg-amber-400/5 p-4">
-              <h3 className="mb-1 flex items-center gap-2 text-sm font-bold text-amber-300"><TriangleAlert className="h-4 w-4" /> Chief Examiner pitfall</h3>
-              <p className="text-sm text-slate-200">{chapter.pitfall}</p>
+            <div className="rounded-xl border border-brand/30 bg-brand/5 p-4">
+              <h3 className="mb-1 flex items-center gap-2 text-sm font-bold text-brand-t"><TriangleAlert className="h-4 w-4" /> Chief Examiner pitfall</h3>
+              <p className="text-sm text-ink">{chapter.pitfall}</p>
             </div>
 
             <div className="flex flex-wrap gap-2">

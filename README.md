@@ -24,3 +24,27 @@ npm run build        # tsc --noEmit && vite build
 3. Open the site and try the **AI Tutor** tab. `GET /api/tutor` reports `{"configured":true}` when the key is set.
 
 Syllabus codes and past-question content are indicative; verify against current NaCCA and WAEC documents before relying on them for exams.
+
+## Teaching features (v3)
+
+| Feature | Where | Needs |
+|---|---|---|
+| Real classes (create, join by code, roster, announcements) | My Classes | Supabase (built in) |
+| AI slides (12 to 24 slides, worked examples, diagrams, notes), presenter mode, PDF and PowerPoint export | AI Slides | `GEMINI_API_KEY` or `ANTHROPIC_API_KEY` |
+| Live class: video, mic, screen share, synced slides, chat, raise hand | Live Class | LiveKit env vars |
+| Recording (tab or screen plus mic) saved in 4-minute segments, replay with resume | Live Class, Recorded Classes | Supabase storage (built in) |
+| Publish announcements, assessments and recordings to Google Classroom; import coursework | Google Classroom | `VITE_GOOGLE_CLIENT_ID` |
+
+### Live classes (LiveKit, free tier)
+1. Create a project at https://cloud.livekit.io and copy the WebSocket URL, API key and secret.
+2. In Vercel, Settings, Environment Variables, add `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`, then redeploy.
+3. Without these, teachers can still present slides and record lessons; students watch the recordings.
+
+### Google Classroom
+1. Google Cloud Console, create a project, enable the **Google Classroom API**.
+2. APIs and Services, OAuth consent screen: External, add your Gmail as a test user, add the Classroom scopes.
+3. Credentials, Create OAuth client ID, type **Web application**, authorised JavaScript origin = your Vercel URL (and http://localhost:5173).
+4. Put the client ID in Vercel as `VITE_GOOGLE_CLIENT_ID` and redeploy.
+
+### Supabase
+Turn off Authentication, Providers, Email, **Confirm email** for instant sign-in, and set Authentication, URL Configuration, Site URL to your Vercel URL.

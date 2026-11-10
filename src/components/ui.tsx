@@ -2,17 +2,17 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 export const cx = (...parts: (string | false | null | undefined)[]) => parts.filter(Boolean).join(" ");
 
-export function Glass({ children, className, as: Tag = "div" }: { children: ReactNode; className?: string; as?: "div" | "section" | "article" | "aside" }) {
-  return <Tag className={cx("glass rounded-2xl", className)}>{children}</Tag>;
+export function Glass({ children, className, as: Tag = "div", role }: { children: ReactNode; className?: string; as?: "div" | "section" | "article" | "aside"; role?: string }) {
+  return <Tag role={role} className={cx("glass rounded-2xl", className)}>{children}</Tag>;
 }
 
 type Variant = "gold" | "teal" | "ghost" | "danger";
 
 const VARIANTS: Record<Variant, string> = {
-  gold: "bg-amber-400 text-slate-950 hover:bg-amber-300 shadow-[0_0_24px_-6px_rgba(251,191,36,0.7)]",
-  teal: "bg-cyan-400 text-slate-950 hover:bg-cyan-300 shadow-[0_0_24px_-6px_rgba(34,211,238,0.7)]",
-  ghost: "bg-slate-800/70 text-slate-100 hover:bg-slate-700/80 border border-slate-700",
-  danger: "bg-red-500 text-white hover:bg-red-400",
+  gold: "bg-brand text-on-brand hover:brightness-110 shadow-sm",
+  teal: "bg-sky-b text-white hover:brightness-110 shadow-sm",
+  ghost: "bg-surface text-ink hover:bg-sunken border border-line",
+  danger: "bg-bad text-white hover:brightness-110",
 };
 
 export function Button({
@@ -34,11 +34,11 @@ export function Button({
 
 export function Pill({ children, tone = "slate", className }: { children: ReactNode; tone?: "slate" | "amber" | "cyan" | "emerald" | "red"; className?: string }) {
   const tones = {
-    slate: "bg-slate-800 text-slate-300 border-slate-700",
-    amber: "bg-amber-400/10 text-amber-300 border-amber-400/30",
-    cyan: "bg-cyan-400/10 text-cyan-300 border-cyan-400/30",
-    emerald: "bg-emerald-400/10 text-emerald-300 border-emerald-400/30",
-    red: "bg-red-500/10 text-red-300 border-red-500/30",
+    slate: "bg-sunken text-ink-2 border-line",
+    amber: "bg-brand/10 text-brand-t border-brand/30",
+    cyan: "bg-sky-b/10 text-sky-t border-sky-b/30",
+    emerald: "bg-good/10 text-good-t border-good/30",
+    red: "bg-bad/10 text-bad-t border-bad/30",
   };
   return <span className={cx("inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold", tones[tone], className)}>{children}</span>;
 }
@@ -47,8 +47,8 @@ export function SectionTitle({ eyebrow, title, children }: { eyebrow?: string; t
   return (
     <header className="mb-5 flex flex-wrap items-end justify-between gap-3">
       <div>
-        {eyebrow && <p className="mono text-xs uppercase tracking-[0.25em] text-amber-400">{eyebrow}</p>}
-        <h1 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">{title}</h1>
+        {eyebrow && <p className="mb-1 text-sm font-semibold text-brand-t">{eyebrow}</p>}
+        <h1 className="text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">{title}</h1>
       </div>
       {children}
     </header>
@@ -61,23 +61,23 @@ export function ProgressRing({
   const clamped = Math.max(0, Math.min(100, value));
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
-  const color = tone === "amber" ? "#fbbf24" : tone === "cyan" ? "#22d3ee" : "#34d399";
+  const color = tone === "amber" ? "var(--c-brand)" : tone === "cyan" ? "var(--c-sky)" : "var(--c-good)";
   return (
     <figure className="flex flex-col items-center gap-2" role="img" aria-label={`${label}: ${Math.round(clamped)} percent`}>
       <div className="relative" style={{ width: size, height: size }}>
         <svg width={size} height={size} className="-rotate-90">
-          <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#1e293b" strokeWidth={stroke} />
+          <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--c-sunken)" strokeWidth={stroke} />
           <circle
             cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={stroke} strokeLinecap="round"
             strokeDasharray={c} strokeDashoffset={c * (1 - clamped / 100)}
             style={{ transition: "stroke-dashoffset 0.9s cubic-bezier(0.34,1.56,0.64,1)", filter: `drop-shadow(0 0 6px ${color}88)` }}
           />
         </svg>
-        <span className="mono absolute inset-0 flex items-center justify-center text-xl font-bold text-white">{Math.round(clamped)}%</span>
+        <span className="mono absolute inset-0 flex items-center justify-center text-xl font-bold text-ink">{Math.round(clamped)}%</span>
       </div>
       <figcaption className="text-center">
-        <span className="block text-sm font-semibold text-slate-100">{label}</span>
-        {sublabel && <span className="block text-xs text-slate-400">{sublabel}</span>}
+        <span className="block text-sm font-semibold text-ink">{label}</span>
+        {sublabel && <span className="block text-xs text-mute">{sublabel}</span>}
       </figcaption>
     </figure>
   );
@@ -94,8 +94,8 @@ export function Modal({ open, onClose, title, children }: { open: boolean; onClo
     >
       <Glass className="rise max-h-[92vh] w-full max-w-2xl overflow-y-auto p-5 sm:p-7 scroll-thin">
         <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="text-lg font-bold text-white">{title}</h2>
-          <button onClick={onClose} aria-label="Close dialog" className="min-h-11 min-w-11 rounded-xl text-slate-300 hover:bg-slate-800">✕</button>
+          <h2 className="text-lg font-bold text-ink">{title}</h2>
+          <button onClick={onClose} aria-label="Close dialog" className="min-h-11 min-w-11 rounded-xl text-ink-2 hover:bg-sunken">✕</button>
         </div>
         {children}
       </Glass>
@@ -104,10 +104,10 @@ export function Modal({ open, onClose, title, children }: { open: boolean; onClo
 }
 
 export const ACCENT: Record<string, string> = {
-  amber: "from-amber-400/25 to-amber-600/5 text-amber-300 border-amber-400/30",
-  cyan: "from-cyan-400/25 to-cyan-600/5 text-cyan-300 border-cyan-400/30",
-  emerald: "from-emerald-400/25 to-emerald-600/5 text-emerald-300 border-emerald-400/30",
-  violet: "from-violet-400/25 to-violet-600/5 text-violet-300 border-violet-400/30",
-  rose: "from-rose-400/25 to-rose-600/5 text-rose-300 border-rose-400/30",
-  sky: "from-sky-400/25 to-sky-600/5 text-sky-300 border-sky-400/30",
+  amber: "from-brand/15 to-transparent text-brand-t border-brand/30",
+  cyan: "from-sky-b/15 to-transparent text-sky-t border-sky-b/30",
+  emerald: "from-good/15 to-transparent text-good-t border-good/30",
+  violet: "from-violet-500/15 to-transparent text-violet-700 border-violet-500/30",
+  rose: "from-rose-500/15 to-transparent text-rose-700 border-rose-500/30",
+  sky: "from-sky-500/15 to-transparent text-sky-700 border-sky-500/30",
 };

@@ -48,6 +48,18 @@ export default function Tutor() {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [diag, setDiag] = useState<string | null>(null);
+  const diagnose = async () => {
+    setDiag("Checking the AI service…");
+    try {
+      const r = await fetch("/api/tutor?test=1");
+      if (!(r.headers.get("content-type") ?? "").includes("json")) { setDiag("The AI function is not deployed on this site. Host the app on Vercel (not a static host)."); return; }
+      const j = (await r.json()) as { provider?: string | null; test?: { ok?: boolean; status?: number; detail?: string } };
+      if (!j.provider) setDiag("No AI key is set. Add GEMINI_API_KEY (free) in Vercel, Settings, Environment Variables, then redeploy.");
+      else if (j.test?.ok) setDiag(`The ${j.provider} AI is working. Press send again.`);
+      else setDiag(`${j.provider} replied with an error${j.test?.status ? ` (${j.test.status})` : ""}: ${j.test?.detail ?? "unknown"}`.slice(0, 400));
+    } catch { setDiag("Could not reach the AI function. Check your internet connection."); }
+  };
   const abortRef = useRef<AbortController | null>(null);
   const endRef = useRef<HTMLDivElement | null>(null);
   const boxRef = useRef<HTMLTextAreaElement | null>(null);
@@ -138,7 +150,7 @@ export default function Tutor() {
       <div className="grid gap-5 lg:grid-cols-[18rem_1fr]">
         <Glass className="hidden h-fit space-y-5 p-4 lg:block" as="aside">
           <fieldset>
-            <legend className="mb-2 text-xs font-semibold uppercase tracking-widest text-slate-400">Mode</legend>
+            <legend className="mb-2 text-xs font-semibold uppercase tracking-widest text-mute">Mode</legend>
             <div className="grid grid-cols-2 gap-2 lg:grid-cols-1">
               {roleModes.map((m) => (
                 <button
@@ -147,22 +159,22 @@ export default function Tutor() {
                   aria-pressed={mode.id === m.id}
                   className={cx(
                     "flex min-h-11 items-center gap-3 rounded-xl border p-3 text-left transition",
-                    mode.id === m.id ? "border-amber-400/60 bg-amber-400/10 text-amber-200" : "border-slate-700 text-slate-300 hover:border-slate-500",
+                    mode.id === m.id ? "border-brand/60 bg-brand/10 text-brand-t" : "border-line text-ink-2 hover:border-line-strong",
                   )}
                 >
                   <m.icon className="h-5 w-5 shrink-0" />
-                  <span><span className="block text-sm font-bold">{m.label}</span><span className="hidden text-xs text-slate-400 lg:block">{m.hint}</span></span>
+                  <span><span className="block text-sm font-bold">{m.label}</span><span className="hidden text-xs text-mute lg:block">{m.hint}</span></span>
                 </button>
               ))}
             </div>
           </fieldset>
 
           <label className="block">
-            <span className="mb-2 block text-xs font-semibold uppercase tracking-widest text-slate-400">Subject focus</span>
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-widest text-mute">Subject focus</span>
             <select
               value={state.subject}
               onChange={(e) => setState((s) => ({ ...s, subject: e.target.value }))}
-              className="min-h-11 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 text-sm text-slate-100"
+              className="min-h-11 w-full rounded-xl border border-line bg-surface px-3 text-sm text-ink"
             >
               <option value="">All subjects</option>
               {subjects.map((s) => <option key={s.id} value={s.name}>{s.name}</option>)}
@@ -172,34 +184,34 @@ export default function Tutor() {
           <Button variant="ghost" className="w-full" disabled={state.turns.length === 0 || busy} onClick={() => { setState((s) => ({ ...s, turns: [] })); setNotice(null); }}>
             <Trash2 className="h-4 w-4" /> Clear conversation
           </Button>
-          <p className="text-xs leading-relaxed text-slate-400">AI can make mistakes. Check important facts against your textbook or teacher. When you are offline, answers come from the built-in curriculum vault.</p>
+          <p className="text-xs leading-relaxed text-mute">AI can make mistakes. Check important facts against your textbook or teacher. When you are offline, answers come from the built-in curriculum vault.</p>
         </Glass>
 
         <Glass className="flex min-h-[22rem] h-[calc(100dvh-21rem)] flex-col overflow-hidden lg:h-[calc(100vh-11rem)]" as="section">
-          <div className="flex items-center gap-2 overflow-x-auto border-b border-slate-800 p-2 lg:hidden" role="group" aria-label="Tutor settings">
+          <div className="flex items-center gap-2 overflow-x-auto border-b border-line p-2 lg:hidden" role="group" aria-label="Tutor settings">
             {roleModes.map((m) => (
               <button key={m.id} onClick={() => setState((s) => ({ ...s, mode: m.id }))} aria-pressed={mode.id === m.id}
-                className={cx("inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border px-3 text-xs font-semibold", mode.id === m.id ? "border-amber-400/60 bg-amber-400/10 text-amber-200" : "border-slate-700 text-slate-300")}>
+                className={cx("inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border px-3 text-xs font-semibold", mode.id === m.id ? "border-brand/60 bg-brand/10 text-brand-t" : "border-line text-ink-2")}>
                 <m.icon className="h-4 w-4" /> {m.label}
               </button>
             ))}
             <label className="sr-only" htmlFor="tutor-subject-m">Subject focus</label>
-            <select id="tutor-subject-m" value={state.subject} onChange={(e) => setState((s) => ({ ...s, subject: e.target.value }))} className="min-h-11 shrink-0 rounded-xl border border-slate-700 bg-slate-900 px-2 text-xs text-slate-100">
+            <select id="tutor-subject-m" value={state.subject} onChange={(e) => setState((s) => ({ ...s, subject: e.target.value }))} className="min-h-11 shrink-0 rounded-xl border border-line bg-surface px-2 text-xs text-ink">
               <option value="">All subjects</option>
               {subjects.map((s) => <option key={s.id} value={s.name}>{s.name}</option>)}
             </select>
-            <button onClick={() => { setState((s) => ({ ...s, turns: [] })); setNotice(null); }} disabled={state.turns.length === 0 || busy} aria-label="Clear conversation" className="grid min-h-11 min-w-11 shrink-0 place-items-center rounded-xl border border-slate-700 text-slate-300 disabled:opacity-40"><Trash2 className="h-4 w-4" /></button>
+            <button onClick={() => { setState((s) => ({ ...s, turns: [] })); setNotice(null); }} disabled={state.turns.length === 0 || busy} aria-label="Clear conversation" className="grid min-h-11 min-w-11 shrink-0 place-items-center rounded-xl border border-line text-ink-2 disabled:opacity-40"><Trash2 className="h-4 w-4" /></button>
           </div>
           <div className="scroll-thin flex-1 space-y-4 overflow-y-auto p-4 sm:p-6" role="log" aria-live="polite" aria-label="Conversation">
             {state.turns.length === 0 && (
               <div className="grid h-full place-items-center text-center">
                 <div className="max-w-md space-y-4">
-                  <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-amber-400 to-cyan-400 text-slate-950 shadow-[0_0_30px_-4px_rgba(251,191,36,0.7)]"><Bot className="h-7 w-7" /></div>
-                  <h2 className="text-xl font-extrabold text-white">{mode.label}: {mode.hint}</h2>
-                  <p className="text-sm text-slate-400">Try one of these to start:</p>
+                  <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand text-on-brand shadow-[0_0_30px_-4px_rgba(251,191,36,0.7)]"><Bot className="h-7 w-7" /></div>
+                  <h2 className="text-xl font-extrabold text-ink">{mode.label}: {mode.hint}</h2>
+                  <p className="text-sm text-mute">Try one of these to start:</p>
                   <div className="flex flex-col gap-2">
                     {SUGGESTIONS[mode.id].map((s) => (
-                      <button key={s} onClick={() => void send(s)} className="min-h-11 rounded-xl border border-slate-700 px-3 py-2 text-left text-sm text-slate-200 transition hover:border-cyan-400/60 hover:bg-cyan-400/5">{s}</button>
+                      <button key={s} onClick={() => void send(s)} className="min-h-11 rounded-xl border border-line px-3 py-2 text-left text-sm text-ink transition hover:border-sky-b/60 hover:bg-sky-b/5">{s}</button>
                     ))}
                   </div>
                 </div>
@@ -210,25 +222,31 @@ export default function Tutor() {
               const streaming = busy && i === state.turns.length - 1 && t.role === "assistant";
               return (
                 <div key={t.id} className={cx("flex gap-3", t.role === "user" && "flex-row-reverse")}>
-                  <div className={cx("grid h-9 w-9 shrink-0 place-items-center rounded-xl text-xs font-bold", t.role === "user" ? "bg-slate-700 text-white" : "bg-gradient-to-br from-amber-400 to-cyan-400 text-slate-950")} aria-hidden>
+                  <div className={cx("grid h-9 w-9 shrink-0 place-items-center rounded-xl text-xs font-bold", t.role === "user" ? "bg-line text-ink" : "bg-brand text-on-brand")} aria-hidden>
                     {t.role === "user" ? "You" : <Bot className="h-5 w-5" />}
                   </div>
-                  <div className={cx("group max-w-[85%] rounded-2xl border px-4 py-3", t.role === "user" ? "border-cyan-400/30 bg-cyan-400/10" : "border-slate-700/80 bg-slate-950/50")}>
-                    {t.role === "user" ? <p className="whitespace-pre-wrap text-sm text-slate-100">{t.content}</p> : t.content ? <Markdown text={t.content} /> : <span className="mono text-xs text-slate-400" role="status">Thinking…</span>}
-                    {streaming && t.content && <span className="ml-1 inline-block h-4 w-1.5 animate-pulse bg-amber-300 align-middle" aria-hidden />}
+                  <div className={cx("group max-w-[85%] rounded-2xl border px-4 py-3", t.role === "user" ? "border-sky-b/30 bg-sky-b/10" : "border-line/80 bg-canvas/50")}>
+                    {t.role === "user" ? <p className="whitespace-pre-wrap text-sm text-ink">{t.content}</p> : t.content ? <Markdown text={t.content} /> : <span className="mono text-xs text-mute" role="status">Thinking…</span>}
+                    {streaming && t.content && <span className="ml-1 inline-block h-4 w-1.5 animate-pulse bg-brand align-middle" aria-hidden />}
                     {t.role === "assistant" && t.content && !streaming && (
-                      <button onClick={() => void copy(t.content)} className="mt-2 inline-flex min-h-8 items-center gap-1 text-xs text-slate-400 hover:text-amber-300" aria-label="Copy answer"><Copy className="h-3.5 w-3.5" /> Copy</button>
+                      <button onClick={() => void copy(t.content)} className="mt-2 inline-flex min-h-8 items-center gap-1 text-xs text-mute hover:text-brand-t" aria-label="Copy answer"><Copy className="h-3.5 w-3.5" /> Copy</button>
                     )}
                   </div>
                 </div>
               );
             })}
-            {notice && <p className="rounded-xl border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-100" role="status">{notice}</p>}
+            {notice && (
+              <div className="space-y-2 rounded-xl border border-brand/30 bg-brand/10 p-3 text-sm text-brand-t" role="status">
+                <p>{notice}</p>
+                <button onClick={() => void diagnose()} className="min-h-9 rounded-lg border border-brand/50 px-3 text-xs font-semibold hover:bg-brand/10">Diagnose AI connection</button>
+                {diag && <p className="mono text-xs text-brand-t">{diag}</p>}
+              </div>
+            )}
             <div ref={endRef} />
           </div>
 
           <form
-            className="flex items-end gap-2 border-t border-slate-800 p-3 sm:p-4"
+            className="flex items-end gap-2 border-t border-line p-3 sm:p-4"
             onSubmit={(e) => { e.preventDefault(); void send(input); }}
           >
             <label className="sr-only" htmlFor="tutor-input">Message to Rexmond AI</label>
@@ -241,7 +259,7 @@ export default function Tutor() {
               rows={2}
               maxLength={4000}
               placeholder={mode.placeholder}
-              className="min-h-14 flex-1 resize-none rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500"
+              className="min-h-14 flex-1 resize-none rounded-xl border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-mute"
             />
             {busy ? (
               <Button type="button" variant="danger" onClick={() => abortRef.current?.abort()} aria-label="Stop generating"><Square className="h-4 w-4" /> Stop</Button>

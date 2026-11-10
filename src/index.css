@@ -1,91 +1,111 @@
 @import "tailwindcss";
 
-@theme {
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  --color-ink: #030712;
+/* Rexmond design tokens. Light is the default; dark follows the device or the toggle. */
+:root {
+  --c-canvas: #f3f6ef; --c-surface: #ffffff; --c-sunken: #e8eee3;
+  --c-line: #d3dccd; --c-line-strong: #aebcaa;
+  --c-ink: #0e1f16; --c-ink-2: #33473b; --c-mute: #5a6e61;
+  --c-brand: #0b6b3a; --c-brand-t: #0a5c32; --c-on-brand: #ffffff;
+  --c-gold: #e8a400; --c-sky: #2457d6; --c-sky-t: #1d47b3;
+  --c-good: #0f7b4e; --c-good-t: #0c6a43; --c-bad: #c62828; --c-bad-t: #b3261e;
+  --c-kente-a: #0b6b3a; --c-kente-b: #e8a400; --c-kente-c: #c62828; --c-kente-d: #0e1f16;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --c-canvas: #08130d; --c-surface: #0f1f16; --c-sunken: #16291e;
+  --c-line: #23392b; --c-line-strong: #345140;
+  --c-ink: #eaf3ec; --c-ink-2: #bccdc1; --c-mute: #8ca594;
+  --c-brand: #34d07f; --c-brand-t: #6be5a2; --c-on-brand: #04210f;
+  --c-gold: #f5b82e; --c-sky: #6f9bff; --c-sky-t: #9dbbff;
+  --c-good: #3dd68c; --c-good-t: #78e5b2; --c-bad: #f0605d; --c-bad-t: #ff9a96;
+  --c-kente-d: #eaf3ec;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --c-canvas: #08130d; --c-surface: #0f1f16; --c-sunken: #16291e;
+    --c-line: #23392b; --c-line-strong: #345140;
+    --c-ink: #eaf3ec; --c-ink-2: #bccdc1; --c-mute: #8ca594;
+    --c-brand: #34d07f; --c-brand-t: #6be5a2; --c-on-brand: #04210f;
+    --c-gold: #f5b82e; --c-sky: #6f9bff; --c-sky-t: #9dbbff;
+    --c-good: #3dd68c; --c-good-t: #78e5b2; --c-bad: #f0605d; --c-bad-t: #ff9a96;
+    --c-kente-d: #eaf3ec;
+    color-scheme: dark;
+  }
 }
 
-html,
-body,
-#root {
-  min-height: 100%;
+@theme inline {
+  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --color-canvas: var(--c-canvas); --color-surface: var(--c-surface); --color-sunken: var(--c-sunken);
+  --color-line: var(--c-line); --color-line-strong: var(--c-line-strong);
+  --color-ink: var(--c-ink); --color-ink-2: var(--c-ink-2); --color-mute: var(--c-mute);
+  --color-brand: var(--c-brand); --color-brand-t: var(--c-brand-t); --color-on-brand: var(--c-on-brand);
+  --color-gold: var(--c-gold); --color-sky-b: var(--c-sky); --color-sky-t: var(--c-sky-t);
+  --color-good: var(--c-good); --color-good-t: var(--c-good-t); --color-bad: var(--c-bad); --color-bad-t: var(--c-bad-t);
 }
+
+html, body, #root { min-height: 100%; }
 
 body {
   margin: 0;
-  background: #030712;
-  color: #e2e8f0;
+  background: var(--c-canvas);
+  color: var(--c-ink);
   font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.55;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background:
-    radial-gradient(60rem 40rem at 10% -10%, rgba(251, 191, 36, 0.12), transparent 60%),
-    radial-gradient(50rem 40rem at 100% 0%, rgba(34, 211, 238, 0.12), transparent 60%),
-    radial-gradient(40rem 30rem at 50% 110%, rgba(34, 211, 238, 0.07), transparent 60%);
-}
+h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.015em; text-wrap: balance; }
+p, li { text-wrap: pretty; }
 
+/* Cards: flat paper with a crisp edge. No blur, so it is also fast on cheap phones. */
 .glass {
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  background: rgb(15 23 42 / 0.7);
-  border: 1px solid rgb(30 41 59 / 0.8);
-  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.02), 0 8px 24px -16px rgb(14 31 22 / 0.18);
 }
 
-.data-saver .glass {
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  background: rgb(15 23 42 / 0.96);
+/* The signature: a woven kente strip. Used sparingly, as the top edge of the app and on hero cards. */
+.kente {
+  height: 6px;
+  background:
+    repeating-linear-gradient(90deg,
+      var(--c-kente-a) 0 18px, var(--c-kente-b) 18px 26px, var(--c-kente-c) 26px 32px,
+      var(--c-kente-b) 32px 40px, var(--c-kente-a) 40px 58px, var(--c-kente-d) 58px 62px);
 }
+.kente-thick { height: 10px; }
+.kente-v { width: 5px; height: 100%; background: repeating-linear-gradient(180deg, var(--c-kente-a) 0 14px, var(--c-kente-b) 14px 20px, var(--c-kente-c) 20px 24px, var(--c-kente-b) 24px 30px); }
 
-.data-saver *,
-.data-saver *::before,
-.data-saver *::after {
-  animation-duration: 0.001ms !important;
-  transition-duration: 0.001ms !important;
-}
+.data-saver *, .data-saver *::before, .data-saver *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 
-.mono {
-  font-family: var(--font-mono);
-}
+.mono { font-family: var(--font-mono); }
 
-:focus-visible {
-  outline: 2px solid #fbbf24;
-  outline-offset: 2px;
-}
+:focus-visible { outline: 3px solid var(--c-gold); outline-offset: 2px; border-radius: 6px; }
 
-@keyframes rec-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgb(239 68 68 / 0.6); }
-  50% { box-shadow: 0 0 0 10px rgb(239 68 68 / 0); }
-}
+select, input, textarea { color: var(--c-ink); }
+input::placeholder, textarea::placeholder { color: var(--c-mute); opacity: 0.8; }
+input:focus, textarea:focus, select:focus { border-color: var(--c-brand) !important; outline-offset: 0; }
+
+@keyframes rec-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgb(198 40 40 / 0.6); } 50% { box-shadow: 0 0 0 10px rgb(198 40 40 / 0); } }
 .rec-pulse { animation: rec-pulse 1.4s ease-in-out infinite; }
 
-@keyframes rise {
-  from { opacity: 0; transform: translateY(12px) scale(0.99); }
-  to { opacity: 1; transform: none; }
-}
-.rise { animation: rise 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.rise { animation: rise 0.35s ease-out both; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; } }
 
 .scroll-thin::-webkit-scrollbar { width: 8px; height: 8px; }
-.scroll-thin::-webkit-scrollbar-thumb { background: #334155; border-radius: 8px; }
+.scroll-thin::-webkit-scrollbar-thumb { background: var(--c-line-strong); border-radius: 8px; }
 
 @media print {
   body { background: #fff !important; color: #000 !important; }
-  body::before { display: none; }
   .no-print { display: none !important; }
   .print-sheet { background: #fff !important; color: #000 !important; box-shadow: none !important; border: 1px solid #999 !important; }
   .print-sheet * { color: #000 !important; }
 }
 
-/* Let grid children shrink below their content width so phones never scroll sideways. */
-main .grid > * {
-  min-width: 0;
-}
+main .grid > * { min-width: 0; }

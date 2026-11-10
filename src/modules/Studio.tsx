@@ -393,7 +393,7 @@ export default function Studio() {
     <div className="space-y-5">
       <SectionTitle eyebrow="Rexmond Live Studio" title="Broadcast & lecture recording">
         <div className="flex items-center gap-2">
-          {recording && <Pill tone="red" className="rec-pulse"><span className="h-2 w-2 rounded-full bg-red-500" /> REC {formatClock(elapsed)}</Pill>}
+          {recording && <Pill tone="red" className="rec-pulse"><span className="h-2 w-2 rounded-full bg-bad" /> REC {formatClock(elapsed)}</Pill>}
           {live && <Pill tone="red" className="rec-pulse"><Radio className="h-3 w-3" /> LIVE {formatClock(elapsed)} · <span className="mono">{viewers} watching</span></Pill>}
         </div>
       </SectionTitle>
@@ -402,14 +402,14 @@ export default function Studio() {
         {([["record", "Record Lecture Video", Video], ["broadcast", "Live Broadcast to Ghana Scholars", Radio]] as const).map(([id, text, Icon]) => (
           <button
             key={id} role="tab" aria-selected={mode === id} disabled={busy && mode !== id} onClick={() => setMode(id)}
-            className={cx("flex min-h-11 items-center gap-2 rounded-lg px-4 text-sm font-bold transition disabled:opacity-40", mode === id ? "bg-amber-400 text-slate-950" : "text-slate-300")}
+            className={cx("flex min-h-11 items-center gap-2 rounded-lg px-4 text-sm font-bold transition disabled:opacity-40", mode === id ? "bg-brand text-on-brand" : "text-ink-2")}
           >
             <Icon className="h-4 w-4" /> {text}
           </button>
         ))}
       </div>
 
-      {notice && <p role="status" className="rounded-xl border border-amber-400/40 bg-amber-400/10 p-3 text-sm text-amber-100">{notice}</p>}
+      {notice && <p role="status" className="rounded-xl border border-brand/40 bg-brand/10 p-3 text-sm text-brand-t">{notice}</p>}
 
       <div className="grid gap-5 xl:grid-cols-[1fr_20rem]">
         <div className="space-y-3">
@@ -418,14 +418,14 @@ export default function Studio() {
               {swatches.map((c) => (
                 <button
                   key={c.value} onClick={() => { setColor(c.value); setEraser(false); }} aria-label={c.name} aria-pressed={!eraser && color === c.value}
-                  className={cx("h-11 w-11 rounded-full border-2 transition", !eraser && color === c.value ? "scale-110 border-white" : "border-slate-700")}
+                  className={cx("h-11 w-11 rounded-full border-2 transition", !eraser && color === c.value ? "scale-110 border-white" : "border-line")}
                   style={{ background: c.value, boxShadow: `0 0 12px ${c.value}66` }}
                 />
               ))}
               <Button variant={eraser ? "gold" : "ghost"} onClick={() => setEraser((v) => !v)} aria-pressed={eraser}><Eraser className="h-4 w-4" /> Eraser</Button>
-              <label className="flex min-h-11 items-center gap-2 px-2 text-xs text-slate-300">
-                Thickness <span className="mono w-5 text-amber-300">{width}</span>
-                <input type="range" min={2} max={20} value={width} onChange={(e) => setWidth(Number(e.target.value))} className="w-28 accent-amber-400" aria-label="Line thickness" />
+              <label className="flex min-h-11 items-center gap-2 px-2 text-xs text-ink-2">
+                Thickness <span className="mono w-5 text-brand-t">{width}</span>
+                <input type="range" min={2} max={20} value={width} onChange={(e) => setWidth(Number(e.target.value))} className="w-28 accent-brand" aria-label="Line thickness" />
               </label>
               <Button onClick={undo} disabled={opCount === 0} aria-label="Undo"><Undo2 className="h-4 w-4" /> Undo</Button>
               <Button onClick={clearBoard} disabled={opCount === 0} aria-label="Clear board"><Trash2 className="h-4 w-4" /> Clear</Button>
@@ -435,7 +435,7 @@ export default function Studio() {
             </div>
           </Glass>
 
-          <div ref={stageRef} className="relative overflow-hidden rounded-2xl border border-slate-700 shadow-2xl" style={{ aspectRatio: `${BOARD_W} / ${BOARD_H}` }}>
+          <div ref={stageRef} className="relative overflow-hidden rounded-2xl border border-line shadow-2xl" style={{ aspectRatio: `${BOARD_W} / ${BOARD_H}` }}>
             <canvas
               ref={boardRef} width={BOARD_W} height={BOARD_H}
               className="block h-full w-full touch-none cursor-crosshair"
@@ -444,15 +444,15 @@ export default function Studio() {
               onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}
             />
             {spotlight && (
-              <div className="rise absolute inset-x-3 top-3 rounded-xl border border-amber-400/50 bg-slate-950/90 p-3 sm:inset-x-6" role="status">
-                <p className="text-xs font-bold text-amber-300">{spotlight.student} · {spotlight.school}</p>
-                <p className="text-sm font-semibold text-white sm:text-base">{spotlight.question}</p>
-                <button onClick={() => { setSpotlight(null); window.speechSynthesis?.cancel(); }} className="mt-1 min-h-11 text-xs text-slate-400 underline">Dismiss</button>
+              <div className="rise absolute inset-x-3 top-3 rounded-xl border border-brand/50 bg-canvas/90 p-3 sm:inset-x-6" role="status">
+                <p className="text-xs font-bold text-brand-t">{spotlight.student} · {spotlight.school}</p>
+                <p className="text-sm font-semibold text-ink sm:text-base">{spotlight.question}</p>
+                <button onClick={() => { setSpotlight(null); window.speechSynthesis?.cancel(); }} className="mt-1 min-h-11 text-xs text-mute underline">Dismiss</button>
               </div>
             )}
             <div
               onPointerDown={onPipDown} onPointerMove={onPipMove} onPointerUp={onPipUp} onPointerCancel={onPipUp}
-              className={cx("absolute h-24 w-24 -translate-x-1/2 -translate-y-1/2 touch-none overflow-hidden rounded-full border-4 border-amber-400 bg-slate-900 shadow-xl sm:h-32 sm:w-32", !camOn && "hidden")}
+              className={cx("absolute h-24 w-24 -translate-x-1/2 -translate-y-1/2 touch-none overflow-hidden rounded-full border-4 border-brand bg-surface shadow-xl sm:h-32 sm:w-32", !camOn && "hidden")}
               style={{ left: `${pip.x}%`, top: `${pip.y}%` }}
               aria-label="Educator webcam. Drag to move."
             >
@@ -464,7 +464,7 @@ export default function Studio() {
             <Button variant={camOn ? "teal" : "ghost"} onClick={() => void toggleCam()} aria-pressed={camOn}>
               {camOn ? <CameraOff className="h-4 w-4" /> : <Camera className="h-4 w-4" />} {camOn ? "Hide webcam" : "Webcam bubble"}
             </Button>
-            <span className={cx("inline-flex min-h-11 items-center gap-1 text-xs", micOn ? "text-emerald-300" : "text-slate-500")}><Mic className="h-4 w-4" /> {micOn ? "Mic live" : "Mic off"}</span>
+            <span className={cx("inline-flex min-h-11 items-center gap-1 text-xs", micOn ? "text-good-t" : "text-mute")}><Mic className="h-4 w-4" /> {micOn ? "Mic live" : "Mic off"}</span>
             <div className="ml-auto flex flex-wrap gap-2">
               {mode === "record" ? (
                 recording
@@ -479,7 +479,7 @@ export default function Studio() {
               {mode === "broadcast" && recording && <Button variant="danger" onClick={stopRecording}><Square className="h-4 w-4" /> Stop recording</Button>}
             </div>
             {mode === "broadcast" && (
-              <p className="w-full text-xs text-slate-400">
+              <p className="w-full text-xs text-mute">
                 Broadcast runs as a simulated classroom room (viewers and questions are generated). To stream to real students, connect a WebRTC media server and publish the same board and audio tracks.
               </p>
             )}
@@ -487,14 +487,14 @@ export default function Studio() {
 
           {clip && (
             <Glass className="space-y-3 p-4" as="section">
-              <h2 className="text-lg font-bold text-white">Recording ready · <span className="mono text-sm text-amber-300">{formatClock(clip.seconds)} · {(clip.blob.size / 1024 / 1024).toFixed(2)} MB · .{extensionFor(clip.mime)}</span></h2>
+              <h2 className="text-lg font-bold text-ink">Recording ready · <span className="mono text-sm text-brand-t">{formatClock(clip.seconds)} · {(clip.blob.size / 1024 / 1024).toFixed(2)} MB · .{extensionFor(clip.mime)}</span></h2>
               <video src={clip.url} controls playsInline className="w-full rounded-xl bg-black" aria-label="Recording preview" />
               <div className="grid gap-2 sm:grid-cols-[1fr_12rem]">
-                <label className="text-xs text-slate-400">Lesson title
-                  <input value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 min-h-11 w-full rounded-xl border border-slate-700 bg-slate-900/80 px-3 text-sm text-white" />
+                <label className="text-xs text-mute">Lesson title
+                  <input value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 min-h-11 w-full rounded-xl border border-line bg-surface/80 px-3 text-sm text-ink" />
                 </label>
-                <label className="text-xs text-slate-400">Subject
-                  <select value={subject} onChange={(e) => setSubject(e.target.value)} className="mt-1 min-h-11 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 text-sm text-white">
+                <label className="text-xs text-mute">Subject
+                  <select value={subject} onChange={(e) => setSubject(e.target.value)} className="mt-1 min-h-11 w-full rounded-xl border border-line bg-surface px-3 text-sm text-ink">
                     {["Core Mathematics", "Elective Mathematics", "Physics", "Chemistry", "Biology", "Integrated Science", "English Language", "Economics"].map((s) => <option key={s}>{s}</option>)}
                   </select>
                 </label>
@@ -510,18 +510,18 @@ export default function Studio() {
         </div>
 
         <Glass className="h-fit p-4" as="aside">
-          <h2 className="mb-1 flex items-center gap-2 text-lg font-bold text-white"><Hand className="h-5 w-5 text-amber-400" /> Raised hands <span className="mono text-sm text-amber-300">({queue.length})</span></h2>
-          <p className="mb-3 text-xs text-slate-400">{live ? "Scholars from top schools are asking questions." : "Go live to receive questions, or simulate one."}</p>
+          <h2 className="mb-1 flex items-center gap-2 text-lg font-bold text-ink"><Hand className="h-5 w-5 text-brand-t" /> Raised hands <span className="mono text-sm text-brand-t">({queue.length})</span></h2>
+          <p className="mb-3 text-xs text-mute">{live ? "Scholars from top schools are asking questions." : "Go live to receive questions, or simulate one."}</p>
           {!live && <Button variant="ghost" className="mb-3 w-full" onClick={raiseNow}>Simulate a raised hand</Button>}
           <ul className="space-y-2" aria-live="polite">
             {queue.map((q) => (
-              <li key={q.id} className="rise rounded-xl border border-slate-700 bg-slate-900/60 p-3">
-                <p className="text-xs font-bold text-cyan-300">{q.student} · {q.school}</p>
-                <p className="mt-1 text-sm text-slate-100">{q.question}</p>
+              <li key={q.id} className="rise rounded-xl border border-line bg-surface/60 p-3">
+                <p className="text-xs font-bold text-sky-t">{q.student} · {q.school}</p>
+                <p className="mt-1 text-sm text-ink">{q.question}</p>
                 <Button variant="gold" className="mt-2 w-full" onClick={() => callOn(q)}><Volume2 className="h-4 w-4" /> Call on student</Button>
               </li>
             ))}
-            {queue.length === 0 && <li className="text-sm text-slate-500">No raised hands right now.</li>}
+            {queue.length === 0 && <li className="text-sm text-mute">No raised hands right now.</li>}
           </ul>
         </Glass>
       </div>

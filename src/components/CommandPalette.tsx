@@ -70,8 +70,8 @@ export function CommandPalette() {
       onKeyDown={(e) => { if (e.key === "Escape") setPaletteOpen(false); }}
     >
       <div className="glass rise w-full max-w-xl overflow-hidden rounded-2xl">
-        <div className="flex items-center gap-3 border-b border-slate-800 px-4">
-          <Search className="h-5 w-5 text-slate-400" aria-hidden />
+        <div className="flex items-center gap-3 border-b border-line px-4">
+          <Search className="h-5 w-5 text-mute" aria-hidden />
           <input
             ref={inputRef}
             value={query}
@@ -84,21 +84,21 @@ export function CommandPalette() {
             role="combobox" aria-expanded="true" aria-controls="palette-list" aria-activedescendant={commands[active] ? `cmd-${commands[active].id}` : undefined}
             aria-label="Search commands, subjects, or ask a question"
             placeholder="Jump to a module, find a subject, or ask a question…"
-            className="min-h-14 flex-1 bg-transparent text-sm text-white placeholder:text-slate-500 focus:outline-none"
+            className="min-h-14 flex-1 bg-transparent text-sm text-ink placeholder:text-mute focus:outline-none"
           />
-          <kbd className="mono hidden rounded border border-slate-700 px-1.5 py-0.5 text-[10px] text-slate-400 sm:block">ESC</kbd>
+          <kbd className="mono hidden rounded border border-line px-1.5 py-0.5 text-[10px] text-mute sm:block">ESC</kbd>
         </div>
         <ul id="palette-list" role="listbox" className="scroll-thin max-h-[50vh] overflow-y-auto p-2">
-          {commands.length === 0 && <li className="p-4 text-sm text-slate-400">No matches. Type a question of 3+ letters to ask the AI tutor.</li>}
+          {commands.length === 0 && <li className="p-4 text-sm text-mute">No matches. Type a question of 3+ letters to ask the AI tutor.</li>}
           {commands.map((c, i) => (
             <li key={c.id} id={`cmd-${c.id}`} role="option" aria-selected={i === active}>
               <button
                 onMouseEnter={() => setActive(i)}
                 onClick={c.run}
-                className={cx("flex min-h-12 w-full items-center gap-3 rounded-xl px-3 text-left", i === active ? "bg-amber-400/15 text-amber-200" : "text-slate-200")}
+                className={cx("flex min-h-12 w-full items-center gap-3 rounded-xl px-3 text-left", i === active ? "bg-brand/15 text-brand-t" : "text-ink")}
               >
                 <c.icon className="h-5 w-5 shrink-0" />
-                <span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold">{c.label}</span><span className="block truncate text-xs text-slate-400">{c.hint}</span></span>
+                <span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold">{c.label}</span><span className="block truncate text-xs text-mute">{c.hint}</span></span>
               </button>
             </li>
           ))}

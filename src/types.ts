@@ -133,7 +133,11 @@ export type View =
   | "growth"
   | "t-home"
   | "t-build"
-  | "t-grades";
+  | "t-grades"
+  | "classes"
+  | "slides"
+  | "live"
+  | "library";
 
 export type Role = "student" | "teacher";
 

@@ -31,7 +31,23 @@ function loadGis(): Promise<void> {
   });
 }
 
-export async function signIn(): Promise<string> {
+export const TEACH_SCOPES = [
+  "https://www.googleapis.com/auth/classroom.courses.readonly",
+  "https://www.googleapis.com/auth/classroom.announcements",
+  "https://www.googleapis.com/auth/classroom.coursework.students",
+].join(" ");
+
+let cached: { token: string; scope: string; until: number } | null = null;
+
+/** Reuses a still-valid token so the teacher is not asked to sign in for every action. */
+export async function signIn(scope: string = CLASSROOM_SCOPES): Promise<string> {
+  if (cached && cached.scope === scope && cached.until > Date.now()) return cached.token;
+  const token = await requestToken(scope);
+  cached = { token, scope, until: Date.now() + 50 * 60 * 1000 };
+  return token;
+}
+
+async function requestToken(scope: string): Promise<string> {
   if (!GOOGLE_CLIENT_ID) throw new Error("No Google client ID configured. Set VITE_GOOGLE_CLIENT_ID to enable live sync.");
   await loadGis();
   const g = (window as unknown as GisWindow).google;
@@ -39,7 +55,7 @@ export async function signIn(): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const client = g.accounts.oauth2.initTokenClient({
       client_id: GOOGLE_CLIENT_ID,
-      scope: CLASSROOM_SCOPES,
+      scope,
       callback: (r) => (r.access_token ? resolve(r.access_token) : reject(new Error(r.error ?? "Sign-in was cancelled."))),
       error_callback: () => reject(new Error("Sign-in was cancelled or blocked (pop-ups may be disabled).")),
     });
@@ -78,4 +94,44 @@ export async function fetchClassroom(token: string): Promise<{ courses: Classroo
     }),
   );
   return { courses: courses.map((c) => ({ id: c.id, name: c.name, section: c.section ?? "", teacher: "" })), items };
+}
+
+async function send<T>(token: string, method: "POST", path: string, body: unknown): Promise<T> {
+  const res = await fetch(`https://classroom.googleapis.com/v1/${path}`, {
+    method, headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    let detail = "";
+    try { detail = ((await res.json()) as { error?: { message?: string } }).error?.message ?? ""; } catch { /* no body */ }
+    if (res.status === 401) cached = null;
+    if (res.status === 403) throw new Error(`Google refused: ${detail || "you may not be a teacher of that course, or the Classroom API is not enabled."}`);
+    throw new Error(`Classroom API ${res.status}: ${detail || res.statusText}`);
+  }
+  return (await res.json()) as T;
+}
+
+/** Courses the signed-in Google user teaches. */
+export async function fetchTeachingCourses(token: string): Promise<ClassroomCourse[]> {
+  const { courses = [] } = await api<{ courses?: ApiCourse[] }>(token, "courses?teacherId=me&courseStates=ACTIVE&pageSize=50");
+  return courses.map((c) => ({ id: c.id, name: c.name, section: c.section ?? "", teacher: "" }));
+}
+
+export async function postAnnouncementToCourse(token: string, courseId: string, text: string): Promise<void> {
+  await send(token, "POST", `courses/${courseId}/announcements`, { text: text.slice(0, 30000), state: "PUBLISHED" });
+}
+
+export interface AssignmentInput { title: string; description: string; maxPoints?: number; due?: Date; links?: { url: string; title: string }[] }
+
+/** Creates an assignment in the course, with the platform links attached as materials. */
+export async function createCourseAssignment(token: string, courseId: string, a: AssignmentInput): Promise<void> {
+  const body: Record<string, unknown> = {
+    title: a.title.slice(0, 3000), description: a.description.slice(0, 30000), workType: "ASSIGNMENT", state: "PUBLISHED",
+    maxPoints: a.maxPoints ?? 100,
+    materials: (a.links ?? []).map((l) => ({ link: { url: l.url, title: l.title } })),
+  };
+  if (a.due) {
+    body.dueDate = { year: a.due.getUTCFullYear(), month: a.due.getUTCMonth() + 1, day: a.due.getUTCDate() };
+    body.dueTime = { hours: a.due.getUTCHours(), minutes: a.due.getUTCMinutes() };
+  }
+  await send(token, "POST", `courses/${courseId}/courseWork`, body);
 }

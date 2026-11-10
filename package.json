@@ -10,8 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
     "canvas-confetti": "^1.9.4",
+    "livekit-client": "^2.23.0",
+    "livekit-server-sdk": "^2.19.2",
     "lucide-react": "^1.64.0",
+    "pptxgenjs": "^4.0.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },

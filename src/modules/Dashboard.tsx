@@ -5,7 +5,7 @@ import { useApp } from "../state/AppContext";
 import { useClass } from "../state/ClassContext";
 import { studentRecommendations, studentTopicMastery } from "../lib/assessment";
 import { RecoCard, useActOnReco } from "./student/Growth";
-import { Button, Glass, Modal, Pill, ProgressRing, SectionTitle, cx } from "../components/ui";
+import { Button, Glass, Modal, Pill, ProgressRing, cx } from "../components/ui";
 import type { View } from "../types";
 
 interface LiveClass {
@@ -46,10 +46,10 @@ function countdown(ms: number): string {
 }
 
 const POWER: { view: View; label: string; icon: typeof Radio; tone: string }[] = [
-  { view: "player", label: "Video Lessons", icon: Radio, tone: "text-red-300" },
-  { view: "vault", label: "Ghana E-Textbooks", icon: BookOpen, tone: "text-amber-300" },
-  { view: "tutor", label: "WAEC AI Lab", icon: Calculator, tone: "text-cyan-300" },
-  { view: "assessments", label: "My Assessments", icon: School, tone: "text-emerald-300" },
+  { view: "player", label: "Video Lessons", icon: Radio, tone: "text-bad-t" },
+  { view: "vault", label: "Ghana E-Textbooks", icon: BookOpen, tone: "text-brand-t" },
+  { view: "tutor", label: "WAEC AI Lab", icon: Calculator, tone: "text-sky-t" },
+  { view: "assessments", label: "My Assessments", icon: School, tone: "text-good-t" },
   { view: "growth", label: "My Growth", icon: Layers, tone: "text-violet-300" },
 ];
 
@@ -85,31 +85,44 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <SectionTitle eyebrow="Student Command Center" title={`Akwaaba, ${settings.name ?? "Scholar"} 👋`}>
-        <Pill tone="amber"><Trophy className="h-3.5 w-3.5" /> {earned.length} / {badges.length} badges</Pill>
-      </SectionTitle>
+      <section className="relative overflow-hidden rounded-3xl bg-brand text-on-brand" aria-label="Welcome">
+        <div className="grid gap-5 p-6 sm:p-8 md:grid-cols-[1fr_auto] md:items-end">
+          <div>
+            <p className="text-sm font-semibold opacity-80">{settings.level === "JHS" ? "JHS · BECE track" : "SHS · WASSCE track"}</p>
+            <h1 className="mt-1 text-4xl font-extrabold leading-[1.05] sm:text-5xl">Akwaaba, {settings.name ?? "Scholar"}.</h1>
+            <p className="mt-3 max-w-xl text-base opacity-90">
+              {completion > 0 ? `You have covered ${Math.round(completion)}% of the curriculum. Keep the streak going.` : "Pick a chapter, ask the AI tutor, or sit a test. Every step you finish shows up here."}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button onClick={() => setView("tutor")} className="min-h-11 rounded-xl bg-surface px-5 text-sm font-bold text-ink shadow-sm transition hover:brightness-95">Ask the AI tutor</button>
+            <button onClick={() => setView("assessments")} className="min-h-11 rounded-xl border border-white/40 px-5 text-sm font-bold text-on-brand transition hover:bg-white/10">Take a test</button>
+          </div>
+        </div>
+        <div className="kente kente-thick" aria-hidden />
+      </section>
 
       <section aria-label="Quick access" className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
         {POWER.map((p) => (
           <button
             key={p.label}
             onClick={() => setView(p.view)}
-            className="glass rise flex min-h-20 flex-col items-start justify-between rounded-2xl p-4 text-left transition hover:-translate-y-0.5 hover:border-amber-400/50"
+            className="glass rise flex min-h-20 flex-col items-start justify-between rounded-2xl p-4 text-left transition hover:-translate-y-0.5 hover:border-brand/50"
           >
             <p.icon className={cx("h-6 w-6", p.tone)} />
-            <span className="text-sm font-bold text-white">{p.label}</span>
+            <span className="text-sm font-bold text-ink">{p.label}</span>
           </button>
         ))}
       </section>
 
-      <Glass className="space-y-3 border-amber-400/30 p-5" as="section">
-        <h2 className="flex items-center gap-2 text-lg font-bold text-white"><Sparkles className="h-5 w-5 text-amber-300" /> Your focus today</h2>
+      <Glass className="space-y-3 border-brand/30 p-5" as="section">
+        <h2 className="flex items-center gap-2 text-lg font-bold text-ink"><Sparkles className="h-5 w-5 text-brand-t" /> Your focus today</h2>
         <ul className="grid gap-3 md:grid-cols-3">{focus.map((r) => <RecoCard key={r.id} r={r} onAct={actOnReco} />)}</ul>
       </Glass>
 
       <div className="grid gap-6 xl:grid-cols-3">
         <Glass className="p-5 xl:col-span-2" as="section">
-          <h2 className="mb-4 text-lg font-bold text-white">Mastery rings</h2>
+          <h2 className="mb-4 text-lg font-bold text-ink">Mastery rings</h2>
           <div className="grid grid-cols-2 place-items-center gap-6 sm:grid-cols-4">
             <ProgressRing value={completion} label="Curriculum" sublabel={`${progress.completedChapters.length}/${TOTAL_CHAPTERS} chapters`} />
             <ProgressRing value={goalPct} tone="cyan" label="Daily goals" sublabel={`${goalsDone}/${progress.goals.length} done`} />
@@ -119,14 +132,14 @@ export default function Dashboard() {
         </Glass>
 
         <Glass className="p-5" as="section">
-          <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-white"><Award className="h-5 w-5 text-amber-400" /> Mastery badges</h2>
+          <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-ink"><Award className="h-5 w-5 text-brand-t" /> Mastery badges</h2>
           <ul className="space-y-2">
             {badges.map((b) => (
-              <li key={b.id} className={cx("flex items-center gap-3 rounded-xl border p-3", b.earned ? "border-amber-400/40 bg-amber-400/10" : "border-slate-800 opacity-60")}>
-                <Trophy className={cx("h-5 w-5 shrink-0", b.earned ? "text-amber-300" : "text-slate-500")} />
+              <li key={b.id} className={cx("flex items-center gap-3 rounded-xl border p-3", b.earned ? "border-brand/40 bg-brand/10" : "border-line opacity-60")}>
+                <Trophy className={cx("h-5 w-5 shrink-0", b.earned ? "text-brand-t" : "text-mute")} />
                 <div className="min-w-0">
-                  <p className="text-sm font-bold text-white">{b.name}</p>
-                  <p className="text-xs text-slate-400">{b.description}</p>
+                  <p className="text-sm font-bold text-ink">{b.name}</p>
+                  <p className="text-xs text-mute">{b.description}</p>
                 </div>
               </li>
             ))}
@@ -136,18 +149,18 @@ export default function Dashboard() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Glass className="p-5" as="section">
-          <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-white"><Clock className="h-5 w-5 text-cyan-300" /> Upcoming live classes</h2>
+          <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-ink"><Clock className="h-5 w-5 text-sky-t" /> Upcoming live classes</h2>
           <ul className="space-y-3">
             {LIVE_CLASSES.map((c) => {
               const ms = mountedAt + c.startsInMin * 60_000 - now;
               return (
-                <li key={c.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-800 p-3">
+                <li key={c.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line p-3">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-bold text-white">{c.title}</p>
-                    <p className="text-xs text-slate-400">{c.teacher}</p>
+                    <p className="truncate text-sm font-bold text-ink">{c.title}</p>
+                    <p className="text-xs text-mute">{c.teacher}</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={cx("mono rounded-lg px-2.5 py-1 text-sm font-bold", ms <= 0 ? "bg-red-500/20 text-red-300" : "bg-cyan-400/10 text-cyan-300")} aria-label={`Starts in ${countdown(ms)}`}>
+                    <span className={cx("mono rounded-lg px-2.5 py-1 text-sm font-bold", ms <= 0 ? "bg-bad/20 text-bad-t" : "bg-sky-b/10 text-sky-t")} aria-label={`Starts in ${countdown(ms)}`}>
                       {countdown(ms)}
                     </span>
                     <Button variant="ghost" onClick={() => setView("studio")}>Join</Button>
@@ -159,17 +172,17 @@ export default function Dashboard() {
         </Glass>
 
         <Glass className="p-5" as="section">
-          <h2 className="mb-3 text-lg font-bold text-white">Daily revision goals</h2>
+          <h2 className="mb-3 text-lg font-bold text-ink">Daily revision goals</h2>
           <ul className="space-y-2">
             {progress.goals.map((g) => (
               <li key={g.id}>
                 <button
                   onClick={() => toggleGoal(g.id)}
                   aria-pressed={g.done}
-                  className="flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-left text-sm hover:bg-slate-800/60"
+                  className="flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-left text-sm hover:bg-sunken/60"
                 >
-                  {g.done ? <CheckCircle2 className="h-5 w-5 text-emerald-400" /> : <Circle className="h-5 w-5 text-slate-500" />}
-                  <span className={cx(g.done && "text-slate-500 line-through")}>{g.text}</span>
+                  {g.done ? <CheckCircle2 className="h-5 w-5 text-good-t" /> : <Circle className="h-5 w-5 text-mute" />}
+                  <span className={cx(g.done && "text-mute line-through")}>{g.text}</span>
                 </button>
               </li>
             ))}
@@ -181,7 +194,7 @@ export default function Dashboard() {
             <label className="sr-only" htmlFor="new-goal">New goal</label>
             <input
               id="new-goal" value={goalText} onChange={(e) => setGoalText(e.target.value)} placeholder="Add a goal…"
-              className="min-h-11 min-w-0 flex-1 rounded-xl border border-slate-700 bg-slate-900/80 px-3 text-sm text-white placeholder:text-slate-500"
+              className="min-h-11 min-w-0 flex-1 rounded-xl border border-line bg-surface/80 px-3 text-sm text-ink placeholder:text-mute"
             />
             <Button variant="gold" type="submit" aria-label="Add goal"><Plus className="h-4 w-4" /></Button>
           </form>
@@ -190,27 +203,27 @@ export default function Dashboard() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Glass className="p-5" as="section">
-          <h2 className="mb-1 text-lg font-bold text-white">Spaced repetition</h2>
-          <p className="mb-4 text-sm text-slate-400">Flashcards come from the key ideas in every chapter and return on a 1, 2, 4, 8, 16 day schedule.</p>
-          <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-800 p-4">
+          <h2 className="mb-1 text-lg font-bold text-ink">Spaced repetition</h2>
+          <p className="mb-4 text-sm text-mute">Flashcards come from the key ideas in every chapter and return on a 1, 2, 4, 8, 16 day schedule.</p>
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-line p-4">
             <div>
-              <p className="mono text-3xl font-bold text-amber-300">{dueCards.length}</p>
-              <p className="text-xs text-slate-400">cards due now</p>
+              <p className="mono text-3xl font-bold text-brand-t">{dueCards.length}</p>
+              <p className="text-xs text-mute">cards due now</p>
             </div>
             <Button variant="gold" disabled={dueCards.length === 0} onClick={() => setReviewing(true)}>Start review</Button>
           </div>
         </Glass>
 
         <Glass className="p-5" as="section">
-          <h2 className="mb-3 text-lg font-bold text-white">Continue learning</h2>
+          <h2 className="mb-3 text-lg font-bold text-ink">Continue learning</h2>
           <ul className="space-y-2">
             {lessons.slice(0, 3).map((l) => (
               <li key={l.id}>
-                <button onClick={() => openLesson(l.id)} className="flex min-h-11 w-full items-center gap-3 rounded-xl border border-slate-800 p-3 text-left hover:border-cyan-400/50">
-                  <PlayCircle className="h-6 w-6 shrink-0 text-cyan-300" />
+                <button onClick={() => openLesson(l.id)} className="flex min-h-11 w-full items-center gap-3 rounded-xl border border-line p-3 text-left hover:border-sky-b/50">
+                  <PlayCircle className="h-6 w-6 shrink-0 text-sky-t" />
                   <span className="min-w-0">
-                    <span className="block truncate text-sm font-bold text-white">{l.title}</span>
-                    <span className="block text-xs text-slate-400">{l.subject} · {l.level}</span>
+                    <span className="block truncate text-sm font-bold text-ink">{l.title}</span>
+                    <span className="block text-xs text-mute">{l.subject} · {l.level}</span>
                   </span>
                 </button>
               </li>
@@ -249,12 +262,12 @@ function FlashcardReview({ open, cards, onClose, onGrade }: { open: boolean; car
     <Modal open={open} onClose={onClose} title="Flashcard review">
       {card ? (
         <div className="space-y-4">
-          <p className="mono text-xs text-slate-400">{queue.length} left in this session</p>
-          <div className="rounded-2xl border border-slate-700 bg-slate-900/70 p-6">
+          <p className="mono text-xs text-mute">{queue.length} left in this session</p>
+          <div className="rounded-2xl border border-line bg-surface/70 p-6">
             <Pill tone="cyan">{card.subject}</Pill>
-            <p className="mt-3 text-sm text-slate-400">Recall a key idea from</p>
-            <p className="text-xl font-extrabold text-white">{card.chapter}</p>
-            {revealed && <p className="rise mt-4 rounded-xl bg-amber-400/10 p-4 text-base text-amber-100">{card.idea}</p>}
+            <p className="mt-3 text-sm text-mute">Recall a key idea from</p>
+            <p className="text-xl font-extrabold text-ink">{card.chapter}</p>
+            {revealed && <p className="rise mt-4 rounded-xl bg-brand/10 p-4 text-base text-brand-t">{card.idea}</p>}
           </div>
           {!revealed ? (
             <Button variant="teal" className="w-full" onClick={() => setRevealed(true)}>Reveal answer</Button>
@@ -266,7 +279,7 @@ function FlashcardReview({ open, cards, onClose, onGrade }: { open: boolean; car
           )}
         </div>
       ) : (
-        <p className="py-8 text-center text-slate-300">All caught up. Cards you answered correctly return at longer intervals. 🎉</p>
+        <p className="py-8 text-center text-ink-2">All caught up. Cards you answered correctly return at longer intervals. 🎉</p>
       )}
     </Modal>
   );

@@ -9,17 +9,17 @@ import { Button, Glass, Pill, ProgressRing, SectionTitle, cx } from "../../compo
 import { LineTrend, MeterRow, StatCard } from "../../components/charts";
 
 export const TONE_BORDER: Record<Reco["tone"], string> = {
-  red: "border-red-400/40 bg-red-500/5",
-  amber: "border-amber-400/40 bg-amber-400/5",
-  cyan: "border-cyan-400/40 bg-cyan-400/5",
-  emerald: "border-emerald-400/40 bg-emerald-400/5",
+  red: "border-bad/40 bg-bad/5",
+  amber: "border-brand/40 bg-brand/5",
+  cyan: "border-sky-b/40 bg-sky-b/5",
+  emerald: "border-good/40 bg-good/5",
 };
 
 export function RecoCard({ r, onAct }: { r: Reco; onAct: (r: Reco) => void }) {
   return (
     <li className={cx("rounded-xl border p-4", TONE_BORDER[r.tone])}>
-      <p className="font-bold text-white">{r.title}</p>
-      <p className="mt-1 text-sm text-slate-300">{r.detail}</p>
+      <p className="font-bold text-ink">{r.title}</p>
+      <p className="mt-1 text-sm text-ink-2">{r.detail}</p>
       {r.action && <Button variant="ghost" className="mt-3" onClick={() => onAct(r)}>{r.action.label}</Button>}
     </li>
   );
@@ -69,39 +69,39 @@ export default function Growth() {
 
       <div className="grid gap-6 xl:grid-cols-3">
         <Glass className="space-y-4 p-5 xl:col-span-2" as="section">
-          <h2 className="flex items-center gap-2 text-lg font-bold text-white"><Target className="h-5 w-5 text-amber-400" /> Topic mastery</h2>
+          <h2 className="flex items-center gap-2 text-lg font-bold text-ink"><Target className="h-5 w-5 text-brand-t" /> Topic mastery</h2>
           {assessed.length === 0 ? (
-            <p className="text-sm text-slate-400">No evidence yet. Complete an assessment and your strengths and gaps will appear here.</p>
+            <p className="text-sm text-mute">No evidence yet. Complete an assessment and your strengths and gaps will appear here.</p>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2">
               {assessed.map((t) => <MeterRow key={t} label={t} pct={mastery[t].pct} />)}
             </div>
           )}
           {TOPICS.filter((t) => !mastery[t]?.evidence).length > 0 && assessed.length > 0 && (
-            <p className="text-xs text-slate-400">Not assessed yet: {TOPICS.filter((t) => !mastery[t]?.evidence).join(", ")}</p>
+            <p className="text-xs text-mute">Not assessed yet: {TOPICS.filter((t) => !mastery[t]?.evidence).join(", ")}</p>
           )}
         </Glass>
 
         <Glass className="space-y-3 p-5" as="section">
-          <h2 className="flex items-center gap-2 text-lg font-bold text-white"><Flame className="h-5 w-5 text-amber-400" /> Score trend</h2>
+          <h2 className="flex items-center gap-2 text-lg font-bold text-ink"><Flame className="h-5 w-5 text-brand-t" /> Score trend</h2>
           <LineTrend points={results.map((r) => r.res.pct)} />
           <div className="flex justify-center"><ProgressRing value={completion} size={96} stroke={9} label="Curriculum" /></div>
         </Glass>
       </div>
 
       <Glass className="space-y-4 p-5" as="section">
-        <h2 className="flex items-center gap-2 text-lg font-bold text-white"><Sparkles className="h-5 w-5 text-cyan-300" /> Recommended for you</h2>
+        <h2 className="flex items-center gap-2 text-lg font-bold text-ink"><Sparkles className="h-5 w-5 text-sky-t" /> Recommended for you</h2>
         <ul className="grid gap-3 md:grid-cols-2">{recos.map((r) => <RecoCard key={r.id} r={r} onAct={act} />)}</ul>
       </Glass>
 
       {results.length > 0 && (
         <Glass className="p-5" as="section">
-          <h2 className="mb-3 text-lg font-bold text-white">Results history</h2>
-          <ul className="divide-y divide-slate-800">
+          <h2 className="mb-3 text-lg font-bold text-ink">Results history</h2>
+          <ul className="divide-y divide-line">
             {[...results].reverse().map(({ sub, a, res }) => (
               <li key={sub.id} className="flex items-center justify-between gap-3 py-3 text-sm">
-                <span className="min-w-0"><span className="block truncate font-semibold text-slate-100">{a.title}</span><span className="text-xs text-slate-400">{a.subject}</span></span>
-                <span className="flex shrink-0 items-center gap-2"><span className="mono text-slate-200">{res.pct}%</span><Pill tone={gradeFor(res.pct).tone}>{gradeFor(res.pct).grade}</Pill></span>
+                <span className="min-w-0"><span className="block truncate font-semibold text-ink">{a.title}</span><span className="text-xs text-mute">{a.subject}</span></span>
+                <span className="flex shrink-0 items-center gap-2"><span className="mono text-ink">{res.pct}%</span><Pill tone={gradeFor(res.pct).tone}>{gradeFor(res.pct).grade}</Pill></span>
               </li>
             ))}
           </ul>

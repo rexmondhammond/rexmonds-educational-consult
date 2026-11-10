@@ -4,6 +4,8 @@ import { SAMPLE_COURSES, SAMPLE_ITEMS } from "../data/classroom";
 import { GOOGLE_CLIENT_ID, fetchClassroom, signIn } from "../lib/google";
 import { deleteBlob, formatBytes, getBlob, putBlob, usePersistentState } from "../lib/storage";
 import { Button, Glass, Pill, SectionTitle, cx } from "../components/ui";
+import { GoogleSync } from "../components/GoogleSync";
+import { useApp } from "../state/AppContext";
 import type { ClassroomCourse, ClassroomItem } from "../types";
 
 interface Index { courses: ClassroomCourse[]; items: ClassroomItem[]; source: "sample" | "google"; syncedAt: number | null }
@@ -12,6 +14,7 @@ const EMPTY: Index = { courses: SAMPLE_COURSES, items: SAMPLE_ITEMS, source: "sa
 const cacheKey = (id: string) => `classroom:${id}`;
 
 export default function Classroom() {
+  const { role } = useApp();
   const [index, setIndex] = usePersistentState<Index>("rex.classroom.index.v1", EMPTY);
   const [cached, setCached] = usePersistentState<string[]>("rex.classroom.cached.v1", []);
   const [courseId, setCourseId] = useState<string>(index.courses[0]?.id ?? "");
@@ -76,27 +79,29 @@ export default function Classroom() {
         <Pill tone={index.source === "google" ? "emerald" : "amber"}>{index.source === "google" ? "Live Google data" : "Sample data"}</Pill>
       </SectionTitle>
 
+      {role === "teacher" && <GoogleSync />}
+
       <Glass className="grid gap-4 p-5 md:grid-cols-3">
-        <Stat icon={<HardDrive className="h-5 w-5 text-emerald-300" />} label="Google Drive bytes used by this app" value="0 B" note="Read-only scopes. Nothing is ever uploaded to Drive." />
-        <Stat icon={<Database className="h-5 w-5 text-cyan-300" />} label="Cached in this device's vault" value={formatBytes(cachedBytes)} note={`${cached.length} items stored in IndexedDB`} />
+        <Stat icon={<HardDrive className="h-5 w-5 text-good-t" />} label="Google Drive bytes used by this app" value="0 B" note="Read-only scopes. Nothing is ever uploaded to Drive." />
+        <Stat icon={<Database className="h-5 w-5 text-sky-t" />} label="Cached in this device's vault" value={formatBytes(cachedBytes)} note={`${cached.length} items stored in IndexedDB`} />
         <div className="flex flex-col justify-between gap-2">
-          <p className="text-xs text-slate-400">{index.syncedAt ? `Last synced ${new Date(index.syncedAt).toLocaleString("en-GB")}` : "Not synced yet"}</p>
+          <p className="text-xs text-mute">{index.syncedAt ? `Last synced ${new Date(index.syncedAt).toLocaleString("en-GB")}` : "Not synced yet"}</p>
           <div className="flex flex-wrap gap-2">
             <Button variant="gold" onClick={() => void connect()} disabled={busy || !GOOGLE_CLIENT_ID}>
               {busy ? <RefreshCw className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />} Sync with Google
             </Button>
             <Button variant="ghost" onClick={() => void useSample()} disabled={busy}>Load sample classroom</Button>
           </div>
-          {!GOOGLE_CLIENT_ID && <p className="text-xs text-amber-200">Live sync needs an OAuth client ID: add <code className="mono">VITE_GOOGLE_CLIENT_ID</code> to a <code className="mono">.env</code> file and rebuild.</p>}
+          {!GOOGLE_CLIENT_ID && <p className="text-xs text-brand-t">Live sync needs an OAuth client ID: add <code className="mono">VITE_GOOGLE_CLIENT_ID</code> to a <code className="mono">.env</code> file and rebuild.</p>}
         </div>
       </Glass>
 
-      {error && <p role="alert" className="rounded-xl border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-200">{error}</p>}
+      {error && <p role="alert" className="rounded-xl border border-bad/40 bg-bad/10 p-3 text-sm text-bad-t">{error}</p>}
 
       <div className="flex flex-wrap gap-2" role="tablist" aria-label="Courses">
         {index.courses.map((c) => (
           <button key={c.id} role="tab" aria-selected={courseId === c.id} onClick={() => setCourseId(c.id)}
-            className={cx("min-h-11 rounded-xl px-4 text-sm font-bold", courseId === c.id ? "bg-cyan-400 text-slate-950" : "glass text-slate-300")}>
+            className={cx("min-h-11 rounded-xl px-4 text-sm font-bold", courseId === c.id ? "bg-sky-b text-on-brand" : "glass text-ink-2")}>
             {c.name}
           </button>
         ))}
@@ -114,8 +119,8 @@ export default function Classroom() {
                       <Pill tone={i.kind === "assignment" ? "amber" : i.kind === "material" ? "cyan" : "slate"}>{i.kind}</Pill>
                       {i.due && <Pill tone="red">Due {i.due}</Pill>}
                     </div>
-                    <p className="truncate font-bold text-white">{i.title}</p>
-                    <p className="mono text-xs text-slate-500">{i.sizeKB} KB</p>
+                    <p className="truncate font-bold text-ink">{i.title}</p>
+                    <p className="mono text-xs text-mute">{i.sizeKB} KB</p>
                   </button>
                   {isCached ? (
                     <Button variant="ghost" onClick={() => void evict(i.id)} aria-label={`Remove ${i.title} from vault`}><CloudOff className="h-4 w-4" /><Trash2 className="h-4 w-4" /></Button>
@@ -126,18 +131,18 @@ export default function Classroom() {
               </li>
             );
           })}
-          {items.length === 0 && <p className="text-slate-400">No items in this course.</p>}
+          {items.length === 0 && <p className="text-mute">No items in this course.</p>}
         </ul>
 
         <Glass className="h-fit p-4" as="aside">
-          <h2 className="mb-2 text-lg font-bold text-white">Reader</h2>
+          <h2 className="mb-2 text-lg font-bold text-ink">Reader</h2>
           {openId ? (
             <>
-              <p className="font-bold text-amber-300">{index.items.find((x) => x.id === openId)?.title}</p>
-              <p className="mt-2 whitespace-pre-wrap text-sm text-slate-200">{openBody || "No text content."}</p>
-              <p className="mt-3 text-xs text-slate-500">{cached.includes(openId) ? "Served from the local vault, so it works offline." : "Not cached yet."}</p>
+              <p className="font-bold text-brand-t">{index.items.find((x) => x.id === openId)?.title}</p>
+              <p className="mt-2 whitespace-pre-wrap text-sm text-ink">{openBody || "No text content."}</p>
+              <p className="mt-3 text-xs text-mute">{cached.includes(openId) ? "Served from the local vault, so it works offline." : "Not cached yet."}</p>
             </>
-          ) : <p className="text-sm text-slate-500">Select an item to read it.</p>}
+          ) : <p className="text-sm text-mute">Select an item to read it.</p>}
         </Glass>
       </div>
     </div>
@@ -147,9 +152,9 @@ export default function Classroom() {
 function Stat({ icon, label, value, note }: { icon: React.ReactNode; label: string; value: string; note: string }) {
   return (
     <div>
-      <div className="flex items-center gap-2 text-xs text-slate-400">{icon}{label}</div>
-      <p className="mono mt-1 text-2xl font-bold text-white">{value}</p>
-      <p className="text-xs text-slate-500">{note}</p>
+      <div className="flex items-center gap-2 text-xs text-mute">{icon}{label}</div>
+      <p className="mono mt-1 text-2xl font-bold text-ink">{value}</p>
+      <p className="text-xs text-mute">{note}</p>
     </div>
   );
 }

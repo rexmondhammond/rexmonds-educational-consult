@@ -3,6 +3,7 @@ import confetti from "canvas-confetti";
 import { SUBJECTS, TOTAL_CHAPTERS, chapterKey } from "../data/curriculum";
 import { DEMO_LESSONS } from "../data/videos";
 import { usePersistentState } from "../lib/storage";
+import { useAuth } from "./AuthContext";
 import type { Progress, Role, Settings, VideoLesson, View } from "../types";
 
 const DEFAULT_PROGRESS: Progress = {
@@ -89,6 +90,7 @@ const DAY = 24 * 60 * 60 * 1000;
 const BOX_INTERVAL_DAYS = [1, 2, 4, 8, 16];
 
 export function AppProvider({ children }: { children: ReactNode }) {
+  const { mode, profile } = useAuth();
   const [view, setView] = useState<View>("dashboard");
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const [progress, setProgress] = usePersistentState<Progress>("rex.progress.v1", DEFAULT_PROGRESS);
@@ -115,6 +117,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     document.documentElement.classList.toggle("data-saver", settings.dataSaver);
   }, [settings.dataSaver]);
 
+  // In a real (signed-in) account the profile is the source of truth for name, level and role.
+  const lastProfile = useRef<string>("");
+  useEffect(() => {
+    if (mode !== "cloud" || !profile) return;
+    const sig = `${profile.id}:${profile.role}:${profile.name}:${profile.level}`;
+    if (lastProfile.current === sig) return;
+    lastProfile.current = sig;
+    setSettings((st) => ({ ...st, name: profile.name, level: profile.level, role: profile.role, onboarded: true }));
+    setView(profile.role === "teacher" ? "t-home" : "dashboard");
+  }, [mode, profile, setSettings]);
+
   const startedRole = useRef(false);
   useEffect(() => {
     if (startedRole.current) return;
@@ -127,7 +140,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const celebrate = useCallback(() => {
     if (settings.dataSaver) return;
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    void confetti({ particleCount: 140, spread: 80, origin: { y: 0.65 }, colors: ["#fbbf24", "#22d3ee", "#f59e0b", "#06b6d4", "#ffffff"] });
+    void confetti({ particleCount: 140, spread: 80, origin: { y: 0.65 }, colors: ["#0b6b3a", "#e8a400", "#c62828", "#34d07f", "#ffffff"] });
   }, [settings.dataSaver]);
 
   const completion = useMemo(

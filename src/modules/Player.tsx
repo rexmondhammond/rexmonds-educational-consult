@@ -17,20 +17,20 @@ export default function Player() {
     <div className="space-y-5">
       <SectionTitle eyebrow="Interactive video lessons" title="Learn with checkpoints" />
       <div className="grid gap-5 xl:grid-cols-[1fr_22rem]">
-        {lesson ? <LessonPlayer key={lesson.id} lesson={lesson} /> : <p className="text-slate-400">No lessons yet.</p>}
+        {lesson ? <LessonPlayer key={lesson.id} lesson={lesson} /> : <p className="text-mute">No lessons yet.</p>}
         <Glass className="h-fit p-4" as="aside">
-          <h2 className="mb-3 text-lg font-bold text-white">Lesson library</h2>
+          <h2 className="mb-3 text-lg font-bold text-ink">Lesson library</h2>
           <ul className="space-y-2">
             {lessons.map((l) => (
               <li key={l.id}>
                 <button
                   onClick={() => openLesson(l.id)} aria-current={l.id === lesson?.id ? "true" : undefined}
-                  className={cx("flex min-h-11 w-full items-start gap-3 rounded-xl border p-3 text-left", l.id === lesson?.id ? "border-amber-400/60 bg-amber-400/10" : "border-slate-800 hover:border-slate-600")}
+                  className={cx("flex min-h-11 w-full items-start gap-3 rounded-xl border p-3 text-left", l.id === lesson?.id ? "border-brand/60 bg-brand/10" : "border-line hover:border-line")}
                 >
-                  <Video className="mt-0.5 h-5 w-5 shrink-0 text-cyan-300" />
+                  <Video className="mt-0.5 h-5 w-5 shrink-0 text-sky-t" />
                   <span className="min-w-0">
-                    <span className="block text-sm font-bold text-white">{l.title}</span>
-                    <span className="mono block text-xs text-slate-400">{l.subject} · {formatClock(l.duration)}</span>
+                    <span className="block text-sm font-bold text-ink">{l.title}</span>
+                    <span className="mono block text-xs text-mute">{l.subject} · {formatClock(l.duration)}</span>
                     {l.source === "recorded" && <Pill tone="emerald" className="mt-1">Recorded in Studio</Pill>}
                   </span>
                 </button>
@@ -209,8 +209,8 @@ function LessonPlayer({ lesson }: { lesson: VideoLesson }) {
       <Glass className="overflow-hidden p-0">
         <div className="relative bg-black" style={{ aspectRatio: `${LESSON_W} / ${LESSON_H}` }}>
           {settings.audioOnly && !isRecorded ? (
-            <div className="grid h-full place-items-center bg-slate-950 text-center">
-              <div><Headphones className="mx-auto h-12 w-12 text-cyan-300" /><p className="mt-2 text-sm text-slate-300">Audio-only mode: the lecture is read aloud to save data.</p></div>
+            <div className="grid h-full place-items-center bg-canvas text-center">
+              <div><Headphones className="mx-auto h-12 w-12 text-sky-t" /><p className="mt-2 text-sm text-ink-2">Audio-only mode: the lecture is read aloud to save data.</p></div>
             </div>
           ) : isRecorded ? (
             videoUrl ? (
@@ -220,16 +220,16 @@ function LessonPlayer({ lesson }: { lesson: VideoLesson }) {
                 aria-label={lesson.title}
                 onError={() => setLoadError("This recording could not be decoded in your browser.")}
               />
-            ) : <div className="grid h-full place-items-center text-sm text-slate-400">{loadError ?? "Loading recording…"}</div>
+            ) : <div className="grid h-full place-items-center text-sm text-mute">{loadError ?? "Loading recording…"}</div>
           ) : (
             <canvas ref={canvasRef} width={LESSON_W} height={LESSON_H} className="h-full w-full" role="img" aria-label={`Board lesson: ${lesson.title}`} />
           )}
 
           {checkpoint && (
-            <div className="absolute inset-0 grid place-items-center overflow-y-auto bg-slate-950/90 p-3 sm:p-6" role="dialog" aria-modal="true" aria-label="Checkpoint question">
+            <div className="absolute inset-0 grid place-items-center overflow-y-auto bg-canvas/90 p-3 sm:p-6" role="dialog" aria-modal="true" aria-label="Checkpoint question">
               <div className="rise w-full max-w-xl space-y-3">
                 <Pill tone="amber">Checkpoint {(active ?? 0) + 1} of {total}</Pill>
-                <p className="text-base font-bold text-white sm:text-lg">{checkpoint.question}</p>
+                <p className="text-base font-bold text-ink sm:text-lg">{checkpoint.question}</p>
                 <div className="grid gap-2" role="radiogroup" aria-label="Answer options">
                   {checkpoint.options.map((o, i) => {
                     const isCorrect = i === checkpoint.correct;
@@ -238,18 +238,18 @@ function LessonPlayer({ lesson }: { lesson: VideoLesson }) {
                         key={o} role="radio" aria-checked={chosen === i} disabled={submitted} onClick={() => setChosen(i)}
                         className={cx(
                           "min-h-11 rounded-xl border px-3 text-left text-sm",
-                          submitted ? (isCorrect ? "border-emerald-400 bg-emerald-400/10" : chosen === i ? "border-red-400 bg-red-500/10" : "border-slate-700 opacity-60")
-                            : chosen === i ? "border-amber-400 bg-amber-400/10" : "border-slate-700 hover:border-slate-500",
+                          submitted ? (isCorrect ? "border-good bg-good/10" : chosen === i ? "border-bad bg-bad/10" : "border-line opacity-60")
+                            : chosen === i ? "border-brand bg-brand/10" : "border-line hover:border-line-strong",
                         )}
                       >
-                        <span className="mono mr-2 text-amber-300">{"ABCD"[i]}.</span>{o}
+                        <span className="mono mr-2 text-brand-t">{"ABCD"[i]}.</span>{o}
                       </button>
                     );
                   })}
                 </div>
-                {showHint && !submitted && <p className="rounded-lg bg-cyan-400/10 p-3 text-sm text-cyan-100"><Lightbulb className="mr-1 inline h-4 w-4" />{checkpoint.hint}</p>}
+                {showHint && !submitted && <p className="rounded-lg bg-sky-b/10 p-3 text-sm text-sky-t"><Lightbulb className="mr-1 inline h-4 w-4" />{checkpoint.hint}</p>}
                 {submitted && (
-                  <p className={cx("rounded-lg p-3 text-sm", chosen === checkpoint.correct ? "bg-emerald-400/10 text-emerald-100" : "bg-red-500/10 text-red-100")} role="status">
+                  <p className={cx("rounded-lg p-3 text-sm", chosen === checkpoint.correct ? "bg-good/10 text-good-t" : "bg-bad/10 text-bad-t")} role="status">
                     <b>{chosen === checkpoint.correct ? "Correct. " : "Not quite. "}</b>WAEC rationale: {checkpoint.rationale}
                   </p>
                 )}
@@ -267,20 +267,20 @@ function LessonPlayer({ lesson }: { lesson: VideoLesson }) {
             <Button variant="gold" onClick={playing ? pause : play} aria-label={playing ? "Pause" : "Play"} disabled={!!checkpoint || (isRecorded && !videoUrl)}>
               {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
             </Button>
-            <span className="mono w-24 text-xs text-slate-300">{formatClock(time)} / {formatClock(lesson.duration)}</span>
+            <span className="mono w-24 text-xs text-ink-2">{formatClock(time)} / {formatClock(lesson.duration)}</span>
             <div className="relative flex-1">
               <input
                 type="range" min={0} max={lesson.duration} step={0.5} value={time} aria-label="Seek"
-                onChange={(e) => seek(Number(e.target.value))} className="h-11 w-full accent-amber-400"
+                onChange={(e) => seek(Number(e.target.value))} className="h-11 w-full accent-brand"
               />
               {lesson.checkpoints.map((c, i) => (
-                <span key={i} className={cx("pointer-events-none absolute top-1/2 h-3 w-1 -translate-y-1/2 rounded", answers[i] === undefined ? "bg-cyan-300" : answers[i] === c.correct ? "bg-emerald-400" : "bg-red-400")} style={{ left: `${(c.at / lesson.duration) * 100}%` }} aria-hidden />
+                <span key={i} className={cx("pointer-events-none absolute top-1/2 h-3 w-1 -translate-y-1/2 rounded", answers[i] === undefined ? "bg-sky-b" : answers[i] === c.correct ? "bg-good" : "bg-bad")} style={{ left: `${(c.at / lesson.duration) * 100}%` }} aria-hidden />
               ))}
             </div>
           </div>
-          {loadError && <p role="alert" className="text-sm text-red-300">{loadError}</p>}
+          {loadError && <p role="alert" className="text-sm text-bad-t">{loadError}</p>}
           {total > 0 && (
-            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-mute">
               <span className="mono">Checkpoints: {answered}/{total} answered · score {score}/{total}</span>
               {answered === total && <Button variant="ghost" onClick={retake}><RotateCcw className="h-4 w-4" /> Retake</Button>}
             </div>
@@ -290,18 +290,18 @@ function LessonPlayer({ lesson }: { lesson: VideoLesson }) {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Glass className="p-4" as="section">
-          <h2 className="mb-2 text-lg font-bold text-white">Transcript</h2>
+          <h2 className="mb-2 text-lg font-bold text-ink">Transcript</h2>
           {lesson.transcript.length === 0 ? (
-            <p className="text-sm text-slate-500">This recording has no transcript. Add timestamped notes instead.</p>
+            <p className="text-sm text-mute">This recording has no transcript. Add timestamped notes instead.</p>
           ) : (
             <ol ref={transcriptRef} className="scroll-thin relative max-h-72 space-y-1 overflow-y-auto">
               {lesson.transcript.map((l, i) => (
                 <li key={l.at}>
                   <button
                     onClick={() => seek(l.at)}
-                    className={cx("flex min-h-11 w-full items-start gap-3 rounded-lg px-2 py-2 text-left text-sm", i === activeLine ? "bg-amber-400/10 text-amber-100" : "text-slate-300 hover:bg-slate-800/60")}
+                    className={cx("flex min-h-11 w-full items-start gap-3 rounded-lg px-2 py-2 text-left text-sm", i === activeLine ? "bg-brand/10 text-brand-t" : "text-ink-2 hover:bg-sunken/60")}
                   >
-                    <span className="mono shrink-0 text-xs text-cyan-300 underline">{formatClock(l.at)}</span>
+                    <span className="mono shrink-0 text-xs text-sky-t underline">{formatClock(l.at)}</span>
                     <span>{l.text}</span>
                   </button>
                 </li>
@@ -311,25 +311,25 @@ function LessonPlayer({ lesson }: { lesson: VideoLesson }) {
         </Glass>
 
         <Glass className="p-4" as="section">
-          <h2 className="mb-2 flex items-center gap-2 text-lg font-bold text-white"><StickyNote className="h-5 w-5 text-amber-400" /> My time-linked notes</h2>
+          <h2 className="mb-2 flex items-center gap-2 text-lg font-bold text-ink"><StickyNote className="h-5 w-5 text-brand-t" /> My time-linked notes</h2>
           <form className="mb-3 flex gap-2" onSubmit={(e) => { e.preventDefault(); addNote(); }}>
             <label className="sr-only" htmlFor="note-input">Note at current time</label>
             <input id="note-input" value={noteText} onChange={(e) => setNoteText(e.target.value)} placeholder={`Note at ${formatClock(time)}…`}
-              className="min-h-11 min-w-0 flex-1 rounded-xl border border-slate-700 bg-slate-900/80 px-3 text-sm text-white placeholder:text-slate-500" />
+              className="min-h-11 min-w-0 flex-1 rounded-xl border border-line bg-surface/80 px-3 text-sm text-ink placeholder:text-mute" />
             <Button variant="gold" type="submit" aria-label="Add note"><Plus className="h-4 w-4" /></Button>
           </form>
           <ul className="scroll-thin max-h-60 space-y-1 overflow-y-auto">
             {useMemo(() => notes, [notes]).map((n) => (
-              <li key={n.id} className="flex items-start gap-2 rounded-lg border border-slate-800 p-2">
-                <button onClick={() => seek(n.at)} className="mono min-h-11 shrink-0 px-1 text-xs text-cyan-300 underline">{formatClock(n.at)}</button>
-                <span className="flex-1 py-2 text-sm text-slate-200">{n.text}</span>
+              <li key={n.id} className="flex items-start gap-2 rounded-lg border border-line p-2">
+                <button onClick={() => seek(n.at)} className="mono min-h-11 shrink-0 px-1 text-xs text-sky-t underline">{formatClock(n.at)}</button>
+                <span className="flex-1 py-2 text-sm text-ink">{n.text}</span>
                 <button
-                  aria-label="Delete note" className="grid min-h-11 min-w-11 place-items-center text-slate-500 hover:text-red-300"
+                  aria-label="Delete note" className="grid min-h-11 min-w-11 place-items-center text-mute hover:text-bad-t"
                   onClick={() => setNotesByLesson((all) => ({ ...all, [lesson.id]: (all[lesson.id] ?? []).filter((x) => x.id !== n.id) }))}
                 ><Trash2 className="h-4 w-4" /></button>
               </li>
             ))}
-            {notes.length === 0 && <li className="text-sm text-slate-500">No notes yet. Pause the lesson and add one.</li>}
+            {notes.length === 0 && <li className="text-sm text-mute">No notes yet. Pause the lesson and add one.</li>}
           </ul>
         </Glass>
       </div>

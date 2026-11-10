@@ -57,7 +57,7 @@ export default function Gradebook() {
     window.setTimeout(() => URL.revokeObjectURL(url), 1500);
   };
 
-  if (!a) return <p className="text-slate-300">No published assessments yet. Create one in the Assessment Builder.</p>;
+  if (!a) return <p className="text-ink-2">No published assessments yet. Create one in the Assessment Builder.</p>;
 
   return (
     <div className="space-y-6">
@@ -69,7 +69,7 @@ export default function Gradebook() {
       <div className="no-print flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Assessments">
         {published.map((p) => (
           <button key={p.id} role="tab" aria-selected={p.id === a.id} onClick={() => setAid(p.id)}
-            className={cx("min-h-11 shrink-0 rounded-xl border px-4 text-sm font-semibold", p.id === a.id ? "border-amber-400/60 bg-amber-400/10 text-amber-200" : "border-slate-700 text-slate-300 hover:border-slate-500")}>{p.title}</button>
+            className={cx("min-h-11 shrink-0 rounded-xl border px-4 text-sm font-semibold", p.id === a.id ? "border-brand/60 bg-brand/10 text-brand-t" : "border-line text-ink-2 hover:border-line-strong")}>{p.title}</button>
         ))}
       </div>
 
@@ -82,22 +82,22 @@ export default function Gradebook() {
 
       <div className="grid gap-6 xl:grid-cols-3">
         <Glass className="overflow-hidden xl:col-span-2" as="section">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 p-4">
-            <h2 className="font-bold text-white">Learner results</h2>
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line p-4">
+            <h2 className="font-bold text-ink">Learner results</h2>
             {pendingRows.length > 0 && <Button variant="teal" onClick={confirmAll}><CheckCheck className="h-4 w-4" /> Confirm all suggested marks</Button>}
           </div>
           <div className="scroll-thin max-h-[32rem] overflow-auto">
             <table className="w-full min-w-[480px] text-sm">
-              <thead className="sticky top-0 bg-slate-950/95 text-left text-xs uppercase tracking-wider text-slate-400"><tr><th className="p-3">Learner</th><th className="p-3">Score</th><th className="p-3">Grade</th><th className="p-3">Status</th><th className="p-3"><span className="sr-only">Action</span></th></tr></thead>
+              <thead className="sticky top-0 bg-canvas/95 text-left text-xs uppercase tracking-wider text-mute"><tr><th className="p-3">Learner</th><th className="p-3">Score</th><th className="p-3">Grade</th><th className="p-3">Status</th><th className="p-3"><span className="sr-only">Action</span></th></tr></thead>
               <tbody>
                 {rows.map(({ student, sub, res }) => {
                   const g = res ? gradeFor(res.pct) : null;
                   return (
-                    <tr key={student.id} className="border-t border-slate-800/70">
-                      <th scope="row" className="p-3 text-left font-semibold text-slate-100">{student.name}</th>
-                      <td className="mono p-3 text-slate-200">{res ? `${res.total}/${res.max} · ${res.pct}%` : "-"}</td>
-                      <td className="p-3">{g ? <Pill tone={g.tone}>{g.grade}</Pill> : <span className="text-slate-500">-</span>}</td>
-                      <td className="p-3 text-xs">{!res ? <span className="text-slate-500">Not submitted</span> : res.pendingReview > 0 ? <span className="text-amber-300">Needs review</span> : <span className="text-emerald-300">Confirmed</span>}</td>
+                    <tr key={student.id} className="border-t border-line/70">
+                      <th scope="row" className="p-3 text-left font-semibold text-ink">{student.name}</th>
+                      <td className="mono p-3 text-ink">{res ? `${res.total}/${res.max} · ${res.pct}%` : "-"}</td>
+                      <td className="p-3">{g ? <Pill tone={g.tone}>{g.grade}</Pill> : <span className="text-mute">-</span>}</td>
+                      <td className="p-3 text-xs">{!res ? <span className="text-mute">Not submitted</span> : res.pendingReview > 0 ? <span className="text-brand-t">Needs review</span> : <span className="text-good-t">Confirmed</span>}</td>
                       <td className="p-3 text-right">{sub && <Button variant="ghost" className="min-h-9 px-3 text-xs" onClick={() => setOpen({ student, sub })}>Review</Button>}</td>
                     </tr>
                   );
@@ -108,15 +108,15 @@ export default function Gradebook() {
         </Glass>
 
         <div className="space-y-6">
-          <Glass className="space-y-3 p-5" as="section"><h2 className="font-bold text-white">Distribution</h2><Histogram counts={stats.distribution} /></Glass>
+          <Glass className="space-y-3 p-5" as="section"><h2 className="font-bold text-ink">Distribution</h2><Histogram counts={stats.distribution} /></Glass>
           <Glass className="space-y-3 p-5" as="section">
-            <h2 className="font-bold text-white">Item analysis</h2>
+            <h2 className="font-bold text-ink">Item analysis</h2>
             <ul className="space-y-3">
               {items.map((it, i) => (
                 <li key={it.question.id} className="text-sm">
-                  <div className="flex items-start justify-between gap-2"><span className="text-slate-200">Q{i + 1}. {it.question.prompt.slice(0, 54)}{it.question.prompt.length > 54 ? "…" : ""}</span><span className="mono shrink-0 text-xs text-slate-300">{it.pctCorrect}%</span></div>
+                  <div className="flex items-start justify-between gap-2"><span className="text-ink">Q{i + 1}. {it.question.prompt.slice(0, 54)}{it.question.prompt.length > 54 ? "…" : ""}</span><span className="mono shrink-0 text-xs text-ink-2">{it.pctCorrect}%</span></div>
                   {it.flag && <Pill tone={it.flag === "too-hard" ? "red" : "cyan"} className="mt-1">{it.flag === "too-hard" ? "Review: very hard" : "Very easy"}</Pill>}
-                  {it.commonWrong && it.pctCorrect < 70 && <p className="mt-1 text-xs text-slate-400">Common wrong answer ({it.commonWrong.share}% of errors): {it.commonWrong.option}</p>}
+                  {it.commonWrong && it.pctCorrect < 70 && <p className="mt-1 text-xs text-mute">Common wrong answer ({it.commonWrong.share}% of errors): {it.commonWrong.option}</p>}
                 </li>
               ))}
             </ul>
@@ -180,35 +180,35 @@ function ReviewModal({ a, student, sub, onClose }: { a: Assessment; student: Stu
           const q = r.question;
           if (q.type === "mcq") {
             return (
-              <div key={q.id} className="rounded-xl border border-slate-800 p-3 text-sm">
-                <div className="flex justify-between gap-2"><span className="text-slate-200">Q{i + 1}. {q.prompt}</span><span className={cx("mono shrink-0", r.correct ? "text-emerald-300" : "text-red-300")}>{r.score}/{r.max}</span></div>
-                <p className="mt-1 text-xs text-slate-400">Chose: {typeof r.answer === "number" ? q.options?.[r.answer] : "No answer"}{!r.correct && ` · Correct: ${q.options?.[q.correct ?? 0]}`}</p>
+              <div key={q.id} className="rounded-xl border border-line p-3 text-sm">
+                <div className="flex justify-between gap-2"><span className="text-ink">Q{i + 1}. {q.prompt}</span><span className={cx("mono shrink-0", r.correct ? "text-good-t" : "text-bad-t")}>{r.score}/{r.max}</span></div>
+                <p className="mt-1 text-xs text-mute">Chose: {typeof r.answer === "number" ? q.options?.[r.answer] : "No answer"}{!r.correct && ` · Correct: ${q.options?.[q.correct ?? 0]}`}</p>
               </div>
             );
           }
           const text = typeof r.answer === "string" ? r.answer : "";
           const manual = g?.manual[q.id];
           return (
-            <div key={q.id} className="space-y-2 rounded-xl border border-amber-400/30 bg-amber-400/5 p-3 text-sm">
-              <p className="text-slate-100">Q{i + 1}. {q.prompt}</p>
-              <p className="whitespace-pre-wrap rounded-lg bg-slate-950/60 p-2 text-slate-200">{text || "No answer"}</p>
+            <div key={q.id} className="space-y-2 rounded-xl border border-brand/30 bg-brand/5 p-3 text-sm">
+              <p className="text-ink">Q{i + 1}. {q.prompt}</p>
+              <p className="whitespace-pre-wrap rounded-lg bg-canvas/60 p-2 text-ink">{text || "No answer"}</p>
               <ul className="flex flex-wrap gap-1.5">{(q.keyPoints ?? []).map((k) => <li key={k}><Pill tone={keyPointCoverage(text, [k]) >= 1 ? "emerald" : "slate"}>{keyPointCoverage(text, [k]) >= 1 ? "✓" : "○"} {k}</Pill></li>)}</ul>
               <div className="flex flex-wrap items-center gap-2">
-                <label className="text-xs text-slate-300" htmlFor={`m-${q.id}`}>Mark (max {q.marks})</label>
+                <label className="text-xs text-ink-2" htmlFor={`m-${q.id}`}>Mark (max {q.marks})</label>
                 <input id={`m-${q.id}`} type="number" step={0.5} min={0} max={q.marks} value={manual ?? r.score}
-                  onChange={(e) => setGrading(sub.id, { manual: { [q.id]: Math.max(0, Math.min(q.marks, Number(e.target.value) || 0)) } })} className="mono min-h-11 w-20 rounded-xl border border-slate-700 bg-slate-900 px-2 text-center text-white" />
+                  onChange={(e) => setGrading(sub.id, { manual: { [q.id]: Math.max(0, Math.min(q.marks, Number(e.target.value) || 0)) } })} className="mono min-h-11 w-20 rounded-xl border border-line bg-surface px-2 text-center text-ink" />
                 {manual === undefined ? <Pill tone="amber">Suggested</Pill> : <Pill tone="emerald">Confirmed</Pill>}
                 <Button variant="teal" className="min-h-11" disabled={busy === q.id} onClick={() => void suggestWithAi(q.id)}><Bot className="h-4 w-4" /> {busy === q.id ? "Marking…" : "AI mark"}</Button>
                 {manual === undefined && <Button variant="ghost" onClick={() => setGrading(sub.id, { manual: { [q.id]: r.score } })}>Confirm</Button>}
               </div>
               <label className="block"><span className="sr-only">Comment for this answer</span>
-                <input value={g?.comments[q.id] ?? ""} onChange={(e) => setGrading(sub.id, { comments: { [q.id]: e.target.value } })} placeholder="Comment for the learner" className="min-h-11 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 text-sm text-white placeholder:text-slate-500" /></label>
+                <input value={g?.comments[q.id] ?? ""} onChange={(e) => setGrading(sub.id, { comments: { [q.id]: e.target.value } })} placeholder="Comment for the learner" className="min-h-11 w-full rounded-xl border border-line bg-surface px-3 text-sm text-ink placeholder:text-mute" /></label>
             </div>
           );
         })}
-        <label className="block"><span className="mb-1 flex items-center justify-between text-xs font-semibold text-slate-400">Overall feedback
-          <button onClick={() => void draftFeedback()} disabled={busy === "overall"} className="inline-flex min-h-8 items-center gap-1 text-cyan-300 hover:text-cyan-200"><Sparkles className="h-3.5 w-3.5" /> {busy === "overall" ? "Drafting…" : "Draft with AI"}</button></span>
-          <textarea value={g?.feedback ?? ""} onChange={(e) => setGrading(sub.id, { feedback: e.target.value })} rows={3} className="w-full resize-y rounded-xl border border-slate-700 bg-slate-900 p-3 text-sm text-white" /></label>
+        <label className="block"><span className="mb-1 flex items-center justify-between text-xs font-semibold text-mute">Overall feedback
+          <button onClick={() => void draftFeedback()} disabled={busy === "overall"} className="inline-flex min-h-8 items-center gap-1 text-sky-t hover:text-sky-t"><Sparkles className="h-3.5 w-3.5" /> {busy === "overall" ? "Drafting…" : "Draft with AI"}</button></span>
+          <textarea value={g?.feedback ?? ""} onChange={(e) => setGrading(sub.id, { feedback: e.target.value })} rows={3} className="w-full resize-y rounded-xl border border-line bg-surface p-3 text-sm text-ink" /></label>
         <Button variant="gold" className="w-full" onClick={onClose}>Done</Button>
       </div>
     </Modal>

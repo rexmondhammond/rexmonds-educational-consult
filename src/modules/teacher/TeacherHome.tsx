@@ -41,19 +41,19 @@ export default function TeacherHome() {
 
   return (
     <div className="space-y-6">
-      <SectionTitle eyebrow="Teacher command center · SHS 2 Science A" title={`Akwaaba, ${settings.name ?? "Teacher"} 👋`}>
+      <SectionTitle eyebrow="Your teaching space" title={`Akwaaba, ${settings.name ?? "Teacher"}`}>
         <Pill tone="cyan"><Users className="h-3.5 w-3.5" /> {roster.length} learners</Pill>
       </SectionTitle>
 
       <section aria-label="Quick actions" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {[
-          { label: "Create assessment", icon: ClipboardList, run: () => setView("t-build"), tone: "text-amber-300" },
-          { label: "Open gradebook", icon: BookOpenCheck, run: () => setView("t-grades"), tone: "text-cyan-300" },
+          { label: "Create assessment", icon: ClipboardList, run: () => setView("t-build"), tone: "text-brand-t" },
+          { label: "Open gradebook", icon: BookOpenCheck, run: () => setView("t-grades"), tone: "text-sky-t" },
           { label: "AI lesson plan", icon: Sparkles, run: () => askTutor({ prompt: "Create a 40-minute NaCCA-aligned lesson plan on solving quadratic equations for SHS 2.", mode: "lesson" }), tone: "text-violet-300" },
-          { label: "Go live", icon: Radio, run: () => setView("studio"), tone: "text-red-300" },
+          { label: "Go live", icon: Radio, run: () => setView("studio"), tone: "text-bad-t" },
         ].map((q) => (
-          <button key={q.label} onClick={q.run} className="glass rise flex min-h-20 flex-col items-start justify-between rounded-2xl p-4 text-left transition hover:-translate-y-0.5 hover:border-amber-400/50">
-            <q.icon className={cx("h-6 w-6", q.tone)} /><span className="text-sm font-bold text-white">{q.label}</span>
+          <button key={q.label} onClick={q.run} className="glass rise flex min-h-20 flex-col items-start justify-between rounded-2xl p-4 text-left transition hover:-translate-y-0.5 hover:border-brand/50">
+            <q.icon className={cx("h-6 w-6", q.tone)} /><span className="text-sm font-bold text-ink">{q.label}</span>
           </button>
         ))}
       </section>
@@ -68,9 +68,9 @@ export default function TeacherHome() {
       <div className="grid gap-6 xl:grid-cols-3">
         <Glass className="space-y-3 p-5 xl:col-span-2" as="section">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-lg font-bold text-white">Score distribution</h2>
+            <h2 className="text-lg font-bold text-ink">Score distribution</h2>
             <label className="sr-only" htmlFor="home-assess">Assessment</label>
-            <select id="home-assess" value={selA?.id ?? ""} onChange={(e) => setSelected(e.target.value)} className="min-h-11 max-w-full rounded-xl border border-slate-700 bg-slate-900 px-3 text-sm text-slate-100">
+            <select id="home-assess" value={selA?.id ?? ""} onChange={(e) => setSelected(e.target.value)} className="min-h-11 max-w-full rounded-xl border border-line bg-surface px-3 text-sm text-ink">
               {published.map((a) => <option key={a.id} value={a.id}>{a.title}</option>)}
             </select>
           </div>
@@ -85,33 +85,33 @@ export default function TeacherHome() {
         </Glass>
 
         <Glass className="space-y-4 p-5" as="section">
-          <h2 className="text-lg font-bold text-white">Class mastery by topic</h2>
+          <h2 className="text-lg font-bold text-ink">Class mastery by topic</h2>
           {data.topicAvg.map((t) => <MeterRow key={t.topic} label={t.topic} pct={t.avg} />)}
         </Glass>
       </div>
 
       <Glass className="space-y-4 p-5" as="section">
-        <h2 className="flex items-center gap-2 text-lg font-bold text-white"><Sparkles className="h-5 w-5 text-cyan-300" /> Recommended actions</h2>
+        <h2 className="flex items-center gap-2 text-lg font-bold text-ink"><Sparkles className="h-5 w-5 text-sky-t" /> Recommended actions</h2>
         <ul className="grid gap-3 md:grid-cols-2">{recos.map((r) => <RecoCard key={r.id} r={r} onAct={act} />)}</ul>
       </Glass>
 
       <Glass className="p-5" as="section">
-        <h2 className="mb-3 text-lg font-bold text-white">Mastery heatmap</h2>
-        <p className="mb-3 text-xs text-slate-400">Learners sorted from most to least support needed. Darker red means a gap to address; green means secure.</p>
+        <h2 className="mb-3 text-lg font-bold text-ink">Mastery heatmap</h2>
+        <p className="mb-3 text-xs text-mute">Learners sorted from most to least support needed. Darker red means a gap to address; green means secure.</p>
         <div className="scroll-thin overflow-x-auto">
           <table className="w-full min-w-[640px] border-separate border-spacing-1 text-xs">
             <thead>
-              <tr><th scope="col" className="sticky left-0 bg-slate-950/90 p-2 text-left text-slate-400">Learner</th>{TOPICS.map((t) => <th scope="col" key={t} className="p-1 font-semibold text-slate-400">{t.split(" ")[0]}</th>)}<th scope="col" className="p-1 text-slate-400">Avg</th></tr>
+              <tr><th scope="col" className="sticky left-0 bg-canvas/90 p-2 text-left text-mute">Learner</th>{TOPICS.map((t) => <th scope="col" key={t} className="p-1 font-semibold text-mute">{t.split(" ")[0]}</th>)}<th scope="col" className="p-1 text-mute">Avg</th></tr>
             </thead>
             <tbody>
               {sorted.map(({ student, mastery, avg, count }) => (
                 <tr key={student.id}>
-                  <th scope="row" className="sticky left-0 whitespace-nowrap bg-slate-950/90 p-2 text-left font-semibold text-slate-200">{student.name}</th>
+                  <th scope="row" className="sticky left-0 whitespace-nowrap bg-canvas/90 p-2 text-left font-semibold text-ink">{student.name}</th>
                   {TOPICS.map((t) => {
                     const v = mastery[t]?.pct ?? 0;
-                    return <td key={t} className="mono h-9 min-w-10 rounded-md text-center font-bold text-slate-950" style={{ background: toneColor(v), opacity: 0.35 + (v / 100) * 0.65 }} title={`${student.name}, ${t}: ${v}%`}>{v}</td>;
+                    return <td key={t} className="mono h-9 min-w-10 rounded-md text-center font-bold text-on-brand" style={{ background: toneColor(v), opacity: 0.35 + (v / 100) * 0.65 }} title={`${student.name}, ${t}: ${v}%`}>{v}</td>;
                   })}
-                  <td className="mono p-1 text-center font-bold text-white">{count ? `${avg}%` : "-"}</td>
+                  <td className="mono p-1 text-center font-bold text-ink">{count ? `${avg}%` : "-"}</td>
                 </tr>
               ))}
             </tbody>
